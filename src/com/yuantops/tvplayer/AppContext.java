@@ -1,5 +1,6 @@
 package com.yuantops.tvplayer;
 
+import com.yuantops.tvplayer.api.HttpClientAPI;
 import com.yuantops.tvplayer.util.StringUtils;
 
 import android.annotation.SuppressLint;
@@ -125,7 +126,8 @@ public class AppContext extends Application{
 			return;
 		}
 		//TODO 在服务器上注销此次登录
-		HttpAPIClient.logout(this.loginRecordId);
+		HttpClientAPI.logout(this.loginRecordId);
+		
 		this.isLogin = false;
 		this.loginAccount = null;
 		this.loginRecordId = null;
@@ -139,7 +141,7 @@ public class AppContext extends Application{
 	 */
 	public String loginAuthenticate(String account, String pwd){
 		//TODO 
-		return HttpAPIClient.loginAuth(account, pwd);
+		return HttpClientAPI.loginAuth(account, pwd);
 	}
 	
 	/**
@@ -193,7 +195,7 @@ public class AppContext extends Application{
 	}
 	
 	/**
-	 * 清除保存的登录参数:
+	 * 清除保存在本地的登录参数:
 	 */
 	public void clearLoginInfo(){
 		SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);

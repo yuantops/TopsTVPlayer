@@ -1,16 +1,16 @@
-package com.yuantops.tvplayer.bean;
+/*package com.yuantops.tvplayer.bean;
 
 import android.content.Context;
 import android.os.Build;
 import android.view.Display;
 import android.view.WindowManager;
 
-/** 
+*//** 
  * Android设备信息实体
  *
  * @author yuan (yuan.tops@gmail.com)
  * @created Dec 28, 2014 6:51:53 PM
- */
+ *//*
 public class Device {
 	private String Manufacturer = null;//制造商
 	private String Model = null;//设备名称
@@ -54,3 +54,4 @@ public class Device {
 	}
 	
 }
+*/
