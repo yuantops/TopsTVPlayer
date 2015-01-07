@@ -19,6 +19,7 @@ public class VideoList implements Serializable{
 	private ArrayList<Video> list;
 	
 	public VideoList(){
+		list = new ArrayList<Video>();
 	}
 	
 	/**

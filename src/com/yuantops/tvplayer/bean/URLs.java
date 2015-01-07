@@ -1,5 +1,10 @@
 package com.yuantops.tvplayer.bean;
 
+/**
+ * 需要用到的服务器IP，Servlet端口、网址，DLNA Proxy的端口等
+ * @author admin (Email: yuan.tops@gmail.com)
+ * @date 2015-1-7
+ */
 public class URLs {
 	
 	public static final int DLNA_PROXY_PORT = 1902;
