@@ -16,9 +16,9 @@ public class Video implements Serializable{
 	private String introduction;//剧情介绍
 	private String releaseDate;//上映日期
 	private String runtime;//时长
-	private String[] category;//类别
+	private String category;//类别:喜剧，爱情，动作……
 	private String type;//直播/点播
-	private String playedTimes;//播放次数
+	private int playedTimes;//播放次数
 	
 	private String posterUrl;//海报图片链接
 	private String highDefiUrl;//高清链接
@@ -26,7 +26,11 @@ public class Video implements Serializable{
 	private String superDefiUrl;//超清链接
 	private String broadcastUrl;//直播链接
 	
-	public Video(String videoName_cn, String videoName_en, String intro, String releaseDate, String runtime, String[] category, String type, String playedTimes, String posterUrl, String highDefiUrl, String standardDefiUrl, String superDefiUrl, String broadcastUrl){
+	public Video(){
+		
+	}
+	
+	public Video(String videoName_cn, String videoName_en, String intro, String releaseDate, String runtime, String category, String type, int playedTimes, String posterUrl, String highDefiUrl, String standardDefiUrl, String superDefiUrl, String broadcastUrl){
 		this.videoName_cn = videoName_cn;
 		this.videoName_en = videoName_en;
 		this.introduction = intro;
@@ -82,11 +86,11 @@ public class Video implements Serializable{
 		this.runtime = runtime;
 	}
 
-	public String[] getCategory() {
+	public String getCategory() {
 		return category;
 	}
 
-	public void setCategory(String[] category) {
+	public void setCategory(String category) {
 		this.category = category;
 	}
 
@@ -98,11 +102,11 @@ public class Video implements Serializable{
 		this.type = type;
 	}
 
-	public String getPlayedTimes() {
+	public int getPlayedTimes() {
 		return playedTimes;
 	}
 
-	public void setPlayedTimes(String playedTimes) {
+	public void setPlayedTimes(int playedTimes) {
 		this.playedTimes = playedTimes;
 	}
 
