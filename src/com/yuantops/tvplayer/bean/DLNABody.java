@@ -42,7 +42,7 @@ public class DLNABody implements Serializable {
 	}
 	
 	/**
-	 * 输出DLNA报文正文：按消息存入的顺序输出。每条消息占一行，前5条消息的顺序固定。
+	 * 输出DLNA报文正文：按消息存入的顺序输出。每条消息占一行，前5条消息的顺序固定。消息格式 key:value
 	 * @return
 	 */
 	public String printDLNABody(){

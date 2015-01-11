@@ -1,7 +1,9 @@
-package com.yuantops.tvplayer.util;
+ package com.yuantops.tvplayer.util;
 
+import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -27,6 +29,11 @@ public class UIRobot {
 		mContext.startActivity(intent);
 	}
 	
+	/**
+	 * 跳转到播放器页面
+	 * @param mContext
+	 * @param video
+	 */
 	public static void openVideoPlayer(Context mContext, Video video){
 		if(video == null){
 			return;
@@ -40,6 +47,10 @@ public class UIRobot {
 		intent.putExtra("video", video);
 		mContext.startActivity(intent);
 		
-		if(mContext.)
+		//如果当前的置顶Activity为播放器，那么销毁它
+		Activity currentActivity = AppManager.getInstance().currentActivity();
+		if(currentActivity.getClass().getSimpleName().equals("VideoPlayActivity_Vitamio") || currentActivity.getClass().getSimpleName().equals("VideoPlayActivity")){
+			AppManager.getInstance().finishActivity();
+		}
 	}
 }
