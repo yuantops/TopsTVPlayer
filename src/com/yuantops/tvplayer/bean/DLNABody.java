@@ -47,7 +47,9 @@ public class DLNABody implements Serializable {
 	 */
 	public String printDLNABody(){
 		StringBuilder strBuilder = new StringBuilder();
-		for(String key:records.keySet()){
+		if(records.keySet().size() == 0){
+			return "";
+		}else for(String key:records.keySet()){
 			strBuilder.append(key+":"+records.get(key));
 			strBuilder.append("\r\n");
 		}

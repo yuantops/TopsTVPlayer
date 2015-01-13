@@ -10,6 +10,7 @@ import java.io.Serializable;
  */
 public class RoutingLabel implements Serializable {	
 
+	private String labelType; //路由标签类型："From""To""Source""Target"
 	private String type; // 设备类型：“Control”“Server”“Agent”“Proxy”
 	private String family;// 设备所属的家庭ID，属于同一家庭ID的设备才能通信
 	private String network;// 设备所在的局域子网地址
@@ -36,12 +37,24 @@ public class RoutingLabel implements Serializable {
 		this.name = name;
 	}
 
+	
 	/**
-	 * @return type:family:network:ip:port:name格式的字符串
+	 * 添加路由标签的类型，并返回
+	 * @param labelType
+	 * @return 添加了labelType的路由标签
+	 */
+	public RoutingLabel addRoutingLabelType(String labelType){
+		RoutingLabel tempLabel = new RoutingLabel(this.type,this.family,this.network,this.ip,this.port,this.name);
+		tempLabel.labelType = labelType;
+		return tempLabel;
+	}
+	
+	/**
+	 * @return From/To/Source/Target: type:family:network:ip:port:name格式的字符串
 	 */
 	public String printLabel() {
-		return this.type + ";" + this.family + ";" + this.network + ";"
-				+ this.ip + ";" + this.port + ";" + this.name;
+		return this.labelType+": "+this.type + ":" + this.family + ":" + this.network + ":"
+				+ this.ip + ":" + this.port + ":" + this.name;
 	}
 
 	public String getType() {
