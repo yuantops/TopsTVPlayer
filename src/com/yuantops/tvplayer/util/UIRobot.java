@@ -1,4 +1,4 @@
- package com.yuantops.tvplayer.util;
+/* package com.yuantops.tvplayer.util;
 
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
@@ -7,19 +7,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-/**
+*//**
  * 处理与UI相关的工具类，包括Activity跳转、显示Dialog、显示Toast
  * @author admin (Email: yuan.tops@gmail.com)
  * @date 2015-1-7
- */
+ *//*
 public class UIRobot {
 	public static final String TAG = UIRobot.class.getSimpleName();
 	
-	/**
+	*//**
 	 * 跳转到影片详情介绍页
 	 * @param mContext
 	 * @param video
-	 */
+	 *//*
 	public static void showVideoDetail(Context mContext, Video video){
 		if(video == null){
 			return;
@@ -29,11 +29,11 @@ public class UIRobot {
 		mContext.startActivity(intent);
 	}
 	
-	/**
+	*//**
 	 * 跳转到播放器页面
 	 * @param mContext
 	 * @param video
-	 */
+	 *//*
 	public static void openVideoPlayer(Context mContext, Video video){
 		if(video == null){
 			return;
@@ -54,3 +54,4 @@ public class UIRobot {
 		}
 	}
 }
+*/
