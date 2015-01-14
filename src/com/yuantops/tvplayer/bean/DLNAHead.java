@@ -41,10 +41,10 @@ public class DLNAHead implements Serializable{
 	public String printDLNAHead(){
 		StringBuilder strBuilder = new StringBuilder();
 		strBuilder.append("POST /DLNA/PROXY/" + this.MessageType + " HTTP/1.0"+ "\r\n");
-		strBuilder.append(this.From.printLabel()+ "\r\n");
-		strBuilder.append(this.To.printLabel()+ "\r\n");
-		strBuilder.append(this.Source.printLabel()+ "\r\n");
-		strBuilder.append(this.Target.printLabel()+ "\r\n");
+		strBuilder.append("From: " + this.From.printLabel()+ "\r\n");
+		strBuilder.append("To: " + this.To.printLabel()+ "\r\n");
+		strBuilder.append("Source: " + this.Source.printLabel()+ "\r\n");
+		strBuilder.append("Target: " + this.Target.printLabel()+ "\r\n");
 		strBuilder.append("Content-length: " + this.ContentLength+ "\r\n");
 		strBuilder.append("\r\n");
 		return strBuilder.toString();

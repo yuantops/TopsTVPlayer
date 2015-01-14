@@ -2,6 +2,7 @@ package com.yuantops.tvplayer.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -12,7 +13,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.yuantops.tvplayer.util.SocketMessageHandler;
-import com.z_A.message.ChannelID;
 
 import android.util.Log;
 
@@ -24,8 +24,7 @@ import android.util.Log;
  */
 public class SocketClient {
 	private static final String TAG = SocketClient.class.getSimpleName();
-
-	private final static int TIMEOUT_CONNECTION = 20000;
+	
 	private final static int SLEEP_TIME_SOCKET = 2000;
 	private final static int BLOCK_TIME_SOCKET = 1000;
 	private final static int RETRY_TIME = 3;
@@ -90,6 +89,11 @@ public class SocketClient {
 		// TODO
 	}
 
+	/**
+	 * 长期监听socket，从中读入数据
+	 * @author yuan (Email: yuan.tops@gmail.com) *
+	 * @date Jan 14, 2015 
+	 */
 	private class ReadSocketThread extends Thread {
 		private SocketMessageHandler mHandler = null;
 
@@ -115,16 +119,51 @@ public class SocketClient {
 							SelectionKey key = keyIterator.next();
 							if (key.isValid() && key.isReadable()) {
 								// a channel is ready for reading
+								int bodyBytesLength = 0;
+								BufferedReader socketReader = null;
 								try {
 									SocketChannel channel = (SocketChannel) key.channel();
-									BufferedReader proxy_reader = channel. .getReader();
+									socketReader = new BufferedReader(new InputStreamReader(channel.socket().getInputStream()));
+									
+									StringBuilder dlnaStrBuidler = new StringBuilder();
+									String lineBuf = socketReader.readLine();
+									if (lineBuf == null){
+										return;
+									} 
+									while (!lineBuf.equals("")) {
+										dlnaStrBuidler.append(lineBuf+"\r\n");
+										if (lineBuf.contains("length")) {
+											bodyBytesLength = Integer.parseInt(lineBuf.split(":")[1]);
+										}
+										lineBuf = socketReader.readLine();
+									}
+									dlnaStrBuidler.append("\r\n");
+									
+									if (bodyBytesLength > 0) {
+										readBuffer = ByteBuffer.allocate(bodyBytesLength);
+										channel.read(readBuffer);
+										dlnaStrBuidler.append(((ByteBuffer)(readBuffer.flip())).asCharBuffer().toString());
+										readBuffer.clear();
+									}	
+									
+									Log.d(TAG+"dlna Message String", dlnaStrBuidler.toString());
+									
+								} catch (Exception e) {
+									e.printStackTrace();
+								} finally {
+									if (socketReader != null) {
+										try {
+											socketReader.close();
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
 								} 
 							}
 							keyIterator.remove();
 						}
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
