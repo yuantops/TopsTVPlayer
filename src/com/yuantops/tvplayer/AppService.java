@@ -79,7 +79,7 @@ public class AppService extends Service {
 	 * @author yuan (Email: yuan.tops@gmail.com) *
 	 * @date Jan 13, 2015 
 	 */
-	class SocketMsgHandler extends Handler{
+	public static class SocketMsgHandler extends Handler{
 		//TODO
 		//根据收到的字符串还原出DLNA报文，生成DLNA报文对象实体
 		//根据报文正文类型，做出下一步处置
