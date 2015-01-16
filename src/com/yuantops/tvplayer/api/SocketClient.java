@@ -1,18 +1,18 @@
 package com.yuantops.tvplayer.api;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.Iterator;
 import java.util.Set;
-
-import com.yuantops.tvplayer.util.SocketMessageHandler;
 
 import android.util.Log;
 
@@ -26,189 +26,294 @@ public class SocketClient {
 	private static final String TAG = SocketClient.class.getSimpleName();
 	
 	private final static int SLEEP_TIME_SOCKET = 2000;
-	private final static int BLOCK_TIME_SOCKET = 1000;
 	private final static int RETRY_TIME = 3;
+	private final static int READ_WRITE_BUFFER_SIZE = 512;
 
-	private SocketChannel socketChannel = null;
-	private Selector selector = null;
-	private ByteBuffer readBuffer = null;
-	private ByteBuffer writeBuffer = null;
+	private String ip;
+	private int port;
+	
+	private boolean runFlag ;//监听开关
+	private SocketChannel socketChannel;
+	private Selector selector;
+	private ByteBuffer readBuffer;
+	private ByteBuffer writeBuffer;
+	
+	private ReceivedMsgHandler mHandler;
 
-	public SocketClient(String ip, int port) {
+
+	/**
+	 * 处理socket接收到的字符串的接口
+	 * @author yuan (Email: yuan.tops@gmail.com) *
+	 * @date Jan 16, 2015 
+	 */
+	interface ReceivedMsgHandler {
+		public void handler (String string);
+	}
+	
+	public SocketClient (String ip, int port, ReceivedMsgHandler mHandler) {
+		this(ip, port);
+		this.mHandler = mHandler;
+	}
+	
+	public SocketClient (String ip, int port) {
+		this.ip = ip;
+		this.port = port;
+		
+		this.runFlag = false;		
+		this.readBuffer = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
+		this.writeBuffer = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
+	}
+		
+	/**
+	 * 新开线程，完成：1.建立socket连接 2.开启监听循环
+	 */
+	public void init() {
+		Log.v(TAG, "init() invoked");
+		if (this.ip == null || this.port == 0) {
+			Log.d(TAG, "init() returned due to null port/ip ");
+			return ;
+		}
+		new InitThread().start();
+	}	
+	
+	/**
+	 * 对应init()的线程
+	 * @author yuan (Email: yuan.tops@gmail.com)
+	 * @date Jan 16, 2015 
+	 */
+	private class InitThread extends Thread {
+		@Override
+		public void run() {
+			establishConnection();
+			keepReadingSocket();
+		}
+	}	
+	
+	/**
+	 * 新建selector,socketChannel；向selector注册socketChannel的可读监听
+	 */
+	private void establishConnection() {
+		Log.v(TAG, "establishConnection() invoked");
 		try {
 			this.selector = Selector.open();
 			this.socketChannel = SocketChannel.open();
 
-			int count = 0;
+			int attempt = 0;
 			do {
 				this.socketChannel.connect(new InetSocketAddress(ip, port));
 				if (this.socketChannel.isConnected()) {
-					count = RETRY_TIME;
+					attempt = RETRY_TIME;
 				} else {
 					Thread.sleep(SLEEP_TIME_SOCKET);
-					count++;
+					attempt++;
 				}
-			} while (!this.socketChannel.isConnected() && count < RETRY_TIME);
+			} while (!this.socketChannel.isConnected() && attempt < RETRY_TIME);
 
-			if (this.isClientAvailable()) {
+			//将socketChannel 设为非阻塞模式，监听可读状态
+			if (this.isPrepared()) {
+				this.runFlag = true;
 				this.socketChannel.configureBlocking(false);
 				this.socketChannel.register(selector, SelectionKey.OP_READ);
+				Log.d(TAG, "socket establishment success");
 			} else {
-				Log.d(TAG, "new Socket Client failed");
+				Log.d(TAG, "socket establishment failed after reaching attempt limit");
 			}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {			
 			Log.d(TAG, "socket establish error");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			Log.d(TAG, "Thread sleep error");
 			e.printStackTrace();
-		}
+		}	
+		Log.v(TAG, "establishConnection() end");
 	}
-
+	
+	
 	/**
-	 * 向socket写字符串
-	 * 
-	 * @param message
+	 * 进入循环，监听socket，读取数据 
 	 */
-	public void sendMessage(String message) {
-		if (!isClientAvailable()) {
-			return;
-		}
-		new WriteToSocketThread(message).start();
-	}
-
-	/**
-	 * 从socket读取数据，交给传入的handler处理
-	 * 
-	 * @param handler
-	 */
-	public void readMessage(SocketMessageHandler handler) {
-		// TODO
-	}
-
-	/**
-	 * 长期监听socket，从中读入数据
-	 * @author yuan (Email: yuan.tops@gmail.com) *
-	 * @date Jan 14, 2015 
-	 */
-	private class ReadSocketThread extends Thread {
-		private SocketMessageHandler mHandler = null;
-
-		public ReadSocketThread(SocketMessageHandler handler) {
-			this.mHandler = handler;
-		}
-
-		@Override
-		public void run() {
-			while (true) {
-				if (!SocketClient.this.isClientAvailable()) {
-					Log.d(TAG,
-							"+++++++++socket not prepared when reading from socket ");
-					return;
-				}
-				try {
-					if (SocketClient.this.selector.select(BLOCK_TIME_SOCKET) > 0) {
-						Set<SelectionKey> selectedKeys = selector
-								.selectedKeys();
-						Iterator<SelectionKey> keyIterator = selectedKeys
-								.iterator();
-						while (keyIterator.hasNext()) {
-							SelectionKey key = keyIterator.next();
-							if (key.isValid() && key.isReadable()) {
-								// a channel is ready for reading
-								int bodyBytesLength = 0;
-								BufferedReader socketReader = null;
-								try {
-									SocketChannel channel = (SocketChannel) key.channel();
-									socketReader = new BufferedReader(new InputStreamReader(channel.socket().getInputStream()));
-									
-									StringBuilder dlnaStrBuidler = new StringBuilder();
-									String lineBuf = socketReader.readLine();
-									if (lineBuf == null){
-										return;
-									} 
-									while (!lineBuf.equals("")) {
-										dlnaStrBuidler.append(lineBuf+"\r\n");
-										if (lineBuf.contains("length")) {
-											bodyBytesLength = Integer.parseInt(lineBuf.split(":")[1]);
-										}
-										lineBuf = socketReader.readLine();
-									}
-									dlnaStrBuidler.append("\r\n");
-									
-									if (bodyBytesLength > 0) {
-										readBuffer = ByteBuffer.allocate(bodyBytesLength);
-										channel.read(readBuffer);
-										dlnaStrBuidler.append(((ByteBuffer)(readBuffer.flip())).asCharBuffer().toString());
-										readBuffer.clear();
-									}	
-									
-									Log.d(TAG+"dlna Message String", dlnaStrBuidler.toString());
-									
-								} catch (Exception e) {
-									e.printStackTrace();
-								} finally {
-									if (socketReader != null) {
-										try {
-											socketReader.close();
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-									}
-								} 
-							}
-							keyIterator.remove();
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	/**
-	 * 向socket中写入数据的线程
-	 * 
-	 * @author yuan (Email: yuan.tops@gmail.com) *
-	 * @date Jan 14, 2015
-	 */
-	private class WriteToSocketThread extends Thread {
-		private String MsgToSend;
-
-		public WriteToSocketThread(String Msg) {
-			this.MsgToSend = Msg;
-		}
-
-		@Override
-		public void run() {
-			if (!SocketClient.this.isClientAvailable()) {
+	private void keepReadingSocket() {
+		Log.v(TAG, "keepReadingSocket() invoked");		
+		
+		while (runFlag) {
+			
+			Log.v(TAG, "start one select loop......");	
+			if (!this.isPrepared()) {
+				Log.d(TAG, "keepReadingSocket() returned due to invalid socket connection");
 				return;
 			}
+			
+			Set<SelectionKey> selectedKeys = null;
 			try {
-				writeBuffer = ByteBuffer.wrap(MsgToSend.getBytes("UTF-8"));
-				synchronized (socketChannel) {
-					socketChannel.write(writeBuffer);
+				Log.v(TAG, "select starts blocking...");
+				selector.select();
+				
+				//selector.select()方法会堵塞，期间runFlag可能改变，因此需要再次检验
+				if (!runFlag) {
+					Log.v(TAG, "keepReading terminates after select()");
+					return;
 				}
+				
+				Log.v(TAG, "select ends blocking...");
+				selectedKeys = selector.selectedKeys();
+				if (selectedKeys.size() == 0) { 
+					Log.v(TAG, "no channel ready, exit loop");
+					continue;	
+				}
+			} catch (IOException e1) {
+				Log.d(TAG, "Exception caught when select channels");
+				e1.printStackTrace();
+			}					
+			
+			Iterator<SelectionKey> keyIterator = selectedKeys.iterator();	
+			
+			while (keyIterator.hasNext()) {
+				Log.v(TAG, "selectedKeys size: " + selectedKeys.size());
+				SelectionKey key = keyIterator.next();
+				keyIterator.remove();
+				if (key.isReadable()) {
+					Log.v(TAG, "socket channel readable selected");			        
+			        try {		
+			        	readBuffer.clear();
+			        	((SocketChannel) key.channel()).read(readBuffer);				        	
+			        } catch (IOException e) {
+			        	System.out.println("Exception caught when reading socket");
+			        	e.printStackTrace();
+			        	continue;
+			        }
+			        				        
+			        readBuffer.flip();
+			        if (readBuffer.remaining() != 0) {
+			        	 Charset charset=Charset.forName("UTF-8");
+					        CharsetDecoder decoder = charset.newDecoder();
+					        CharBuffer charBuffer;
+							try {
+								charBuffer = decoder.decode(readBuffer);
+								this.mHandler.handler(charBuffer.toString());
+								Log.v(TAG, "decoded string from socket>>>>>>\n" + charBuffer.toString());
+							} catch (CharacterCodingException e) {
+								Log.d(TAG, "Exception caught when decoding from bytes");
+								e.printStackTrace();
+							}
+			        }   
+			       	readBuffer.clear();			    
+			    } 
+			}
+		}
+		Log.v(TAG, "keepReadingSocket() end");
+	}
+	
+	/**
+	 * 新开线程，向socket写字符串 
+	 * @param message
+	 */	
+	public void sendMessage(String str) {
+		new sendMessageThread(str).start();
+	}
+	
+	/**
+	 * 对应sendMessage的线程：向socket中发送字符串
+	 * @author yuan (Email: yuan.tops@gmail.com) 
+	 * @date Jan 16, 2015 
+	 */
+	private class sendMessageThread extends Thread {
+		String msg;
+		
+		public sendMessageThread(String msg) {
+			this.msg = msg;
+		}
+		
+		@Override
+		public void run() {
+			writeSocket(msg);
+		}
+	}
+	
+	/**
+	 * 向socket写字符串 
+	 * @param message
+	 */
+	private void writeSocket(String str) {
+		Log.v(TAG, "sendMessage() invoked");
+		if (!isPrepared()) {
+			Log.v(TAG, "sendMessage() returned due to channel unprepared");
+			return;
+		}	
+
+		synchronized (this.writeBuffer) {
+			try {
+				writeBuffer.clear();
+				writeBuffer.put(str.getBytes("UTF-8"));
+				writeBuffer.flip();
+				Log.v(TAG, "bytes of the message: "
+						+ str.getBytes("UTF-8").length);
+				Log.v(TAG, "bytes awaits to be sent in writeBuffer: "
+						+ writeBuffer.remaining());
 			} catch (UnsupportedEncodingException e) {
-				Log.d(TAG, "++++++not supported encoding");
+				Log.d(TAG, "Exception caught when getting bytes from string");
 				e.printStackTrace();
+			}
+			try {
+				this.socketChannel.write(writeBuffer);
+				Log.v(TAG,
+						"bytes left in writeBuffer: " + writeBuffer.remaining());
 			} catch (IOException e) {
-				Log.d(TAG, "++++++IO error when writing to socket");
+				Log.d(TAG, "Exception caught when writing data into socket");
 				e.printStackTrace();
 			}
 		}
+		Log.v(TAG, "sendMessage() end");
 	}
-
+			
 	/**
-	 * 当前的socketClient是否成功可用
-	 * 
+	 * 暂停监听socket，不能写入/读出数据
+	 */
+	public void pauseSocket() {
+		Log.v(TAG, "pauseSocket() invoked...");
+		this.runFlag = false;
+	}
+	
+	/**
+	 * 新开线程，恢复监听socket
+	 */
+	public void resumeSocket() {
+		this.runFlag = true;
+		new Thread(){
+			@Override
+			public void run() {
+				keepReadingSocket();
+			}
+		}.start();
+	}
+	
+	/**
+	 * 彻底销毁socket连接
+	 */
+	public void destroy() {
+		Log.v(TAG, "destroy() invoked");
+		this.runFlag = false;
+		try {
+			if (selector != null) {
+				selector.close();
+			}
+			if (socketChannel != null ) {
+				socketChannel.close();
+			}			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+	
+	/**
+	 * socketClient对象是否可用 
 	 * @return
 	 */
-	private boolean isClientAvailable() {
-		return this.socketChannel.isConnected() && this.selector.isOpen();
-	}
+	public boolean isPrepared() {
+		if (this.socketChannel == null || this.selector == null) {
+			return false;
+		} else {
+			return this.socketChannel.isConnected() && this.selector.isOpen();
+		}
+	}	
 }

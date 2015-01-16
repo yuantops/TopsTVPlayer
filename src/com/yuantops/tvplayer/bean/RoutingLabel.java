@@ -47,7 +47,6 @@ public class RoutingLabel implements Serializable {
 		} else {
 			return temp + ":" + this.name;
 		}
-		
 	}
 
 	public String getType() {
