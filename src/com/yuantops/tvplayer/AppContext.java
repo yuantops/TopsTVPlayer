@@ -3,7 +3,6 @@ package com.yuantops.tvplayer;
 import com.yuantops.tvplayer.api.HttpClientAPI;
 import com.yuantops.tvplayer.util.StringUtils;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 
 /** 
  * 全局上下文：保存调用全局配置，调用网络访问api
@@ -24,11 +24,14 @@ public class AppContext extends Application{
 	public static final int NETTYPE_CMWAP = 0x02;
 	public static final int NETTYPE_CMNET = 0x03; 
 	
+	public static final String ENCRYPT_KEY = "toBeOrNotToBe";
+	
 	private boolean isLogin = false;
 	private String loginAccount = null;
 	private String loginRecordId = null;
 	
 	private String IPAddress = null;
+	private String deviceType = Build.MODEL;
 	
 	@Override
 	public void onCreate(){
@@ -94,6 +97,14 @@ public class AppContext extends Application{
 	 */
 	public String getLocalIP(){
 		return this.IPAddress;
+	}
+	
+	/**
+	 * 获取机器型号
+	 * @return device type
+	 */
+	public String getDeviceType() {
+		return this.deviceType;
 	}
 	
 	/**
@@ -201,7 +212,7 @@ public class AppContext extends Application{
 		SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 		sharedPreferences.edit().putString("account", "");
 		sharedPreferences.edit().putString("password", "");
-		sharedPreferences.edit().putString("isRememberMe", "false");
+		sharedPreferences.edit().putString("isRememberMe", "");
 		sharedPreferences.edit().commit();
 	}
 	

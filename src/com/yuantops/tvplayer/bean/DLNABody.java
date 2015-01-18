@@ -42,6 +42,15 @@ public class DLNABody implements Serializable {
 	}
 	
 	/**
+	 * 获取参数
+	 * @param key
+	 * @return
+	 */
+	public String getValue (String key) {
+		return records.get(key);
+	}
+	
+	/**
 	 * 输出DLNA报文正文：按消息存入的顺序输出。每条消息占一行，前5条消息的顺序固定。消息格式 key:value
 	 * @return
 	 */

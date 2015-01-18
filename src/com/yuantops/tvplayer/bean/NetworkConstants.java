@@ -5,7 +5,7 @@ package com.yuantops.tvplayer.bean;
  * @author admin (Email: yuan.tops@gmail.com)
  * @date 2015-1-7
  */
-public class URLs {
+public class NetworkConstants {
 	
 	public static final int DLNA_PROXY_PORT = 1902;
 
@@ -18,7 +18,7 @@ public class URLs {
 	public static final int PROXY_PORT_MIN = 1910;
 	public static final int PROXY_PORT_MAX = 1999;
 	
-	public static String web_server_ip = "";
+	public static String server_ip = "";
 	public static final String WEB_SERVER_PORT = "8080";
 	public static final String WEB_SERVER_APP_NAME = "FlingHttpServer";
 	

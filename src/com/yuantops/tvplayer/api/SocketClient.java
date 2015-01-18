@@ -14,6 +14,9 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.yuantops.tvplayer.util.SocketMsgDispatcher;
+
+import android.content.Context;
 import android.util.Log;
 
 /**
@@ -32,27 +35,22 @@ public class SocketClient {
 	private String ip;
 	private int port;
 	
+	private Context mContext;
 	private boolean runFlag ;//监听开关
 	private SocketChannel socketChannel;
 	private Selector selector;
 	private ByteBuffer readBuffer;
-	private ByteBuffer writeBuffer;
-	
-	private ReceivedMsgHandler mHandler;
+	private ByteBuffer writeBuffer;	
 
-
-	/**
-	 * 处理socket接收到的字符串的接口
-	 * @author yuan (Email: yuan.tops@gmail.com) *
-	 * @date Jan 16, 2015 
-	 */
-	interface ReceivedMsgHandler {
-		public void handler (String string);
-	}
-	
-	public SocketClient (String ip, int port, ReceivedMsgHandler mHandler) {
+		
+	/*public SocketClient (String ip, int port, SocketMsgDispatcher mHandler) {
 		this(ip, port);
 		this.mHandler = mHandler;
+	}*/
+	
+	public SocketClient (String ip, int port, Context context) {
+		this(ip, port);
+		this.mContext = context;
 	}
 	
 	public SocketClient (String ip, int port) {
@@ -138,11 +136,7 @@ public class SocketClient {
 		
 		while (runFlag) {
 			
-			Log.v(TAG, "start one select loop......");	
-			if (!this.isPrepared()) {
-				Log.d(TAG, "keepReadingSocket() returned due to invalid socket connection");
-				return;
-			}
+			Log.v(TAG, "start one select loop......");
 			
 			Set<SelectionKey> selectedKeys = null;
 			try {
@@ -153,8 +147,7 @@ public class SocketClient {
 				if (!runFlag) {
 					Log.v(TAG, "keepReading terminates after select()");
 					return;
-				}
-				
+				}				
 				Log.v(TAG, "select ends blocking...");
 				selectedKeys = selector.selectedKeys();
 				if (selectedKeys.size() == 0) { 
@@ -171,7 +164,6 @@ public class SocketClient {
 			while (keyIterator.hasNext()) {
 				Log.v(TAG, "selectedKeys size: " + selectedKeys.size());
 				SelectionKey key = keyIterator.next();
-				keyIterator.remove();
 				if (key.isReadable()) {
 					Log.v(TAG, "socket channel readable selected");			        
 			        try {		
@@ -180,7 +172,6 @@ public class SocketClient {
 			        } catch (IOException e) {
 			        	System.out.println("Exception caught when reading socket");
 			        	e.printStackTrace();
-			        	continue;
 			        }
 			        				        
 			        readBuffer.flip();
@@ -190,7 +181,7 @@ public class SocketClient {
 					        CharBuffer charBuffer;
 							try {
 								charBuffer = decoder.decode(readBuffer);
-								this.mHandler.handler(charBuffer.toString());
+								SocketMsgDispatcher.processMsg(mContext, charBuffer.toString());
 								Log.v(TAG, "decoded string from socket>>>>>>\n" + charBuffer.toString());
 							} catch (CharacterCodingException e) {
 								Log.d(TAG, "Exception caught when decoding from bytes");
@@ -199,6 +190,8 @@ public class SocketClient {
 			        }   
 			       	readBuffer.clear();			    
 			    } 
+
+				keyIterator.remove();
 			}
 		}
 		Log.v(TAG, "keepReadingSocket() end");

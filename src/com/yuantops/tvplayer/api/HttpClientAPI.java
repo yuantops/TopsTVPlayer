@@ -13,7 +13,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
-import com.yuantops.tvplayer.bean.URLs;
+import com.yuantops.tvplayer.bean.NetworkConstants;
 
 
 /**
@@ -113,7 +113,7 @@ public class HttpClientAPI {
 	 * @return 认证失败："0"; 认证成功：数据库中登录记录号
 	 */
 	public static String loginAuth(String account, String CyptedPwd){
-		String baseURL = "http://" + URLs.web_server_ip + ":"+ URLs.WEB_SERVER_PORT  + URLs.HTTP_URL_DELIMITER + URLs.LOGIN_SERVLET;
+		String baseURL = "http://" + NetworkConstants.server_ip + ":"+ NetworkConstants.WEB_SERVER_PORT  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.LOGIN_SERVLET;
 		
 		Map<String, String> loginParams = new HashMap<String, String>();
 		loginParams.put("Account", account);
@@ -127,7 +127,7 @@ public class HttpClientAPI {
 	 * @param loginId 登录成功后返回的登录记录ID
 	 */
 	public static void logout(String loginId){
-		String baseURL = "http://" + URLs.web_server_ip + ":"+ URLs.WEB_SERVER_PORT  + URLs.HTTP_URL_DELIMITER + URLs.LOGOUT_SERVLET;
+		String baseURL = "http://" + NetworkConstants.server_ip + ":"+ NetworkConstants.WEB_SERVER_PORT  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.LOGOUT_SERVLET;
 		
 		Map<String, String> logoutParams = new HashMap<String, String>();
 		logoutParams.put("LoginRecord", loginId);

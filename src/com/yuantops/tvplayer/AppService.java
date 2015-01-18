@@ -4,6 +4,8 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 import com.yuantops.tvplayer.api.SocketClient;
+import com.yuantops.tvplayer.bean.NetworkConstants;
+import com.yuantops.tvplayer.util.SocketMsgDispatcher;
 
 import android.app.Service;
 import android.content.Intent;
@@ -21,21 +23,18 @@ import android.util.Log;
 public class AppService extends Service {
 	private static final String TAG = AppService.class.getSimpleName();
 	
-	private MyBinder myBinder = null;
-	
-	private SocketClient socketClient = null;
-	private SocketChannel socketClientChannel = null;
-	private Selector selector = null;
-
-	private SocketMsgHandler socketMsgHandler = null;
+	private MyBinder myBinder;	
+	private SocketClient socketClient;
 	
 	@Override
 	public void onCreate() {
 		// The service is being created
 		super.onCreate();
 		myBinder = new MyBinder();
-		socketClientChannel = establishSocketConnection();
-		selector = openAndRegisterSelector();
+		
+		//初始化socketClient，int()方法会新开后台线程监听socket连接
+		socketClient = new SocketClient(NetworkConstants.server_ip, NetworkConstants.DLNA_PROXY_PORT, this);
+		socketClient.init();
 		Log.v(TAG, "onCreate()");
 	}
 	
@@ -60,47 +59,15 @@ public class AppService extends Service {
 	@Override
 	public void onDestroy() {
 		// The service is no longer used and is being destroyed
+		//销毁socketClient客户端
+		socketClient.destroy();
 	}
 	
 	class MyBinder extends Binder {
 		public int sendMessage(String msg) {
-			// TODO 启动线程发送信息
+			socketClient.sendMessage(msg);
 			return 0;
 		}
-	}
+	}	
 	
-	private SocketChannel establishSocketConnection(){
-		SocketChannel channel = null;
-		
-	}
-	
-	/**
-	 * 处理传入的DLNA报文，并根据报文类型，做下一步处理
-	 * @author yuan (Email: yuan.tops@gmail.com) *
-	 * @date Jan 13, 2015 
-	 */
-	public static class SocketMsgHandler extends Handler{
-		//TODO
-		//根据收到的字符串还原出DLNA报文，生成DLNA报文对象实体
-		//根据报文正文类型，做出下一步处置
-	}
-	
-	/**
-	 * 从socket中接收数据，处理成字符串形式的DLNA报文
-	 * @author yuan (Email: yuan.tops@gmail.com) *
-	 * @date Jan 13, 2015 
-	 */
-	class ReadMsgFromSocketThread extends Thread{
-		
-	}
-	
-	/**
-	 * 向socket中发送数据
-	 * @author yuan (Email: yuan.tops@gmail.com) *
-	 * @date Jan 13, 2015 
-	 */
-	class SendMsgToSocketThread extends Thread{
-		
-	}
-
 }
