@@ -18,14 +18,14 @@ public class NetworkConstants {
 	public static final int PROXY_PORT_MIN = 1910;
 	public static final int PROXY_PORT_MAX = 1999;
 	
-	public static String server_ip = "";
+	
 	public static final String WEB_SERVER_PORT = "8080";
-	public static final String WEB_SERVER_APP_NAME = "FlingHttpServer";
+	public static final String WEB_SERVER_APP_NAME = "WebServer";
 	
 	public static final String HTTP_URL_DELIMITER = "/";
 	
 	//TODO 填充每个servlet
-	public static final String LOGIN_SERVLET = "";
+	public static final String LOGIN_SERVLET = "LoginServlet";
 	public static final String LOGOUT_SERVLET = "";
 	public static final String GET_VIDEO_LIST_SERVLET = "";
 	public static final String GET_CHANNEL_STATUS_SERVLET = "";

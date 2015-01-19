@@ -33,7 +33,7 @@ public class AppService extends Service {
 		myBinder = new MyBinder();
 		
 		//初始化socketClient，int()方法会新开后台线程监听socket连接
-		socketClient = new SocketClient(NetworkConstants.server_ip, NetworkConstants.DLNA_PROXY_PORT, this);
+		socketClient = new SocketClient(((AppContext)this.getApplication()).getServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
 		socketClient.init();
 		Log.v(TAG, "onCreate()");
 	}

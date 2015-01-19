@@ -47,7 +47,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	private Button serverIPRefresh;
 	private ImageView loginQRCode;// 登录二维码，主要包含当前设备的IP地址
 	
-	private AppContext globalAppContext = (AppContext) getApplication();
+	private AppContext globalAppContext = null;
 	
 	private ServiceConnection conn = new ServiceConnection() {
 		@Override
@@ -65,10 +65,23 @@ public class LoginActivity extends Activity implements OnClickListener {
 	private BroadcastReceiver loginBrdReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
-			DLNABody params = (DLNABody) arg1.getParcelableExtra("Params");
-			String loginAccount = params.getValue("LoginAccount");
-			String loginRecordId = params.getValue("LoginId");
+			DLNABody params = (DLNABody) arg1.getSerializableExtra("Params");
 			
+			//登录ID "0":认证失败；非零:认证成功
+			if(params.getValue("RECORDID").equals("0")) {
+				UIRobot.showToast(LoginActivity.this, "Login Auth Failed.");
+				return;
+			}
+			
+			String loginAccount = params.getValue("ACCOUNT");
+			String loginRecordId = params.getValue("RECORDID");
+			//密码 为空:第三方登录(二维码扫描); 非空:本机以http方式登录
+			//第三方登录，不保存帐号、密码信息到磁盘
+			if(!StringUtils.isEmpty(params.getValue("PASSWORD"))) {
+				String loginPassword = params.getValue("PASSWORD");
+				globalAppContext.saveLoginInfoParams(true, loginAccount, loginPassword, globalAppContext.getServerIP());
+			}
+
 			globalAppContext.setLoginInfo(loginAccount, loginRecordId);
 			UIRobot.gotoHomePage(LoginActivity.this);
 		}		
@@ -80,16 +93,12 @@ public class LoginActivity extends Activity implements OnClickListener {
 		this.setContentView(R.layout.activity_login);
 		AppManager.getInstance().addActivity(this);
 		
+		globalAppContext = (AppContext) this.getApplication();
 		globalAppContext.initIPAddress();
 		initViewComponents();
-		
-		//取出保存的服务器IP，如果不为空，用它给server_ip变量赋值
-		if(!StringUtils.isEmpty(globalAppContext.getLoginInfoParams("server_ip"))) {
-			NetworkConstants.server_ip = globalAppContext.getLoginInfoParams("server_ip");
-		}
-		
-		//如果网络可用，1) 以绑定方式启动service 2)注册处理登录的broadcast receiver
-		if(globalAppContext.isNetworkConnected()) {
+						
+		//如果a)网络可用且b)服务器IP合法，1) 以绑定方式启动service 2)注册处理登录的broadcast receiver
+		if(globalAppContext.isNetworkConnected() &&  StringUtils.isValidIPAddress(globalAppContext.getServerIP())) {
 			Intent intent = new Intent(this, AppService.class);
 	        bindService(intent, conn, Context.BIND_AUTO_CREATE);
 	        mBound = true;
@@ -131,10 +140,10 @@ public class LoginActivity extends Activity implements OnClickListener {
 		registerButton.setOnClickListener(this);
 		serverIPRefresh.setOnClickListener(this);
 
-		//取出保存在机器上的 本机IP,设备类型,服务器IP地址
+		//取出本机IP,设备类型,服务器IP地址
 		deviceTextView.setText(globalAppContext.getDeviceType());
 		ipTextView.setText(globalAppContext.getLocalIP());
-		serverIPEditText.setText(globalAppContext.getLoginInfoParams("server_ip"));
+		serverIPEditText.setText(globalAppContext.getServerIP());
 		
 		//如果上次登录时选择了“记住我”，那么显示上次登录的帐号，密码，勾选复选框
 		if(globalAppContext.getLoginInfoParams("isRememberMe").equals("true")) {
@@ -146,21 +155,75 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		if(v.getId() == R.id.loginacccount){			
-			if(globalAppContext.isNetworkConnected() && !StringUtils.isEmpty(acountEditText.getText().toString()) && !StringUtils.isEmpty(pwdEditText.getText().toString()) ) {
-				new Thread() {
-					@Override
-					public void run() {
-						String recoredId = HttpClientAPI.loginAuth(acountEditText.getText().toString(), CyptoUtils.encode(globalAppContext.ENCRYPT_KEY, pwdEditText.getText().toString()));
-						//TODO 要新建一个进程，处理登录事宜
-						if
-					}
-				}.start();
-			}
+		if(v.getId() == R.id.loginacccount){
+			String loginAccount = acountEditText.getText().toString();
+			String loginPassword = pwdEditText.getText().toString();
+			String severIP = serverIPEditText.getText().toString();
+			
+			if(!globalAppContext.isNetworkConnected()) {
+				//如果无网络连接，提示无法请稍候再试
+				UIRobot.showToast(this, "No network! Please try again later.");
+			} else if(StringUtils.isEmpty(loginAccount)) {
+				//帐号为空
+				UIRobot.showToast(this, "Login Account cannot be empty!");
+			} else if(StringUtils.isEmpty(loginPassword)) {
+				//密码为空
+				UIRobot.showToast(this, "Password cannot be empty!");
+			} else if(StringUtils.isEmpty(severIP) || !StringUtils.isValidIPAddress(severIP)) {
+				//服务器IP不合法
+				UIRobot.showToast(this, "Please input valid server IP address!");
+ 			} else {
+ 				
+ 				//更新serverIP
+ 				globalAppContext.setServerIP(severIP);
+ 				
+				//如果还没绑定后台服务，绑定后台服务，并注册登录broadcast receiver
+				if(!mBound || !mRegistered) {
+					Intent intent = new Intent(this, AppService.class);
+			        bindService(intent, conn, Context.BIND_AUTO_CREATE);
+			        mBound = true;
+			        
+			        registerReceiver(loginBrdReceiver, intentFilter);
+			        mRegistered = true;
+				}
+								
+				//新开一个线程，1)去服务器认证 2)若认证成功，发送登录成功的广播。保存登录帐号，密码，服务器IP以便下次登录时显示
+				new LoginAuthThread(this,loginAccount,CyptoUtils.encode(AppContext.ENCRYPT_KEY, loginPassword)).start();
+ 			}			
 		} else if(v.getId() == R.id.loginregedit) {
 			
 		} else if(v.getId() == R.id.save_server_ip) {
 			
+		}
+	}
+	
+	/**
+	 * 到服务器登录认证，结果以广播形式发出
+	 * @author yuan (Email: yuan.tops@gmail.com) *
+	 * @date Jan 19, 2015 
+	 */
+	class LoginAuthThread extends Thread {
+		private Context mContext;
+		private String mAccount;
+		private String mPassword;
+		
+		public LoginAuthThread(Context context, String account, String password) {
+			this.mContext = context;
+			this.mAccount = account;
+			this.mPassword = password;
+		}
+		
+		@Override
+		public void run() {
+			String recordID = HttpClientAPI.loginAuth(globalAppContext.getServerIP(), mAccount, mPassword);
+			DLNABody loginAuthResult = new DLNABody();
+			loginAuthResult.addRecord("ACTION", "LOGIN");
+			loginAuthResult.addRecord("ACCOUNT", mAccount);
+			loginAuthResult.addRecord("PASSWORD", mPassword);
+			loginAuthResult.addRecord("RECORDID", recordID);
+			Intent intent = new Intent(SocketMsgDispatcher.LOGIN_BROADCAST);
+			intent.putExtra("Params", loginAuthResult);
+			mContext.sendBroadcast(intent);
 		}
 	}
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
 /**
  * DLNA报文的正文
  * @author yuan (Email: yuan.tops@gmail.com) 
@@ -64,5 +65,6 @@ public class DLNABody implements Serializable {
 		}
 		return strBuilder.toString();
 	}
+	
 	
 }

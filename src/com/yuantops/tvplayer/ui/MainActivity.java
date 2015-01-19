@@ -1,4 +1,6 @@
-package com.yuantops.tvplayer;
+package com.yuantops.tvplayer.ui;
+
+import com.yuantops.tvplayer.R;
 
 import android.os.Bundle;
 import android.app.Activity;

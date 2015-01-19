@@ -32,6 +32,7 @@ public class AppContext extends Application{
 	
 	private String IPAddress = null;
 	private String deviceType = Build.MODEL;
+	private String serverIPAddress = null;
 	
 	@Override
 	public void onCreate(){
@@ -129,6 +130,22 @@ public class AppContext extends Application{
 	}
 	
 	/**
+	 * 设置服务器IP地址
+	 * @param ip
+	 */
+	public void setServerIP(String ip) {
+		this.serverIPAddress = ip;
+	}
+	
+	/**
+	 * 获取服务器IP地址
+	 * @return
+	 */
+	public String getServerIP() {
+		return this.serverIPAddress;
+	}
+	
+	/**
 	 * 注销此次登录
 	 * 在服务器上注销登录；还原登录标记
 	 */
@@ -137,7 +154,7 @@ public class AppContext extends Application{
 			return;
 		}
 		//TODO 在服务器上注销此次登录
-		HttpClientAPI.logout(this.loginRecordId);
+		HttpClientAPI.logout(this.serverIPAddress, this.loginRecordId);
 		
 		this.isLogin = false;
 		this.loginAccount = null;
@@ -150,13 +167,13 @@ public class AppContext extends Application{
 	 * @param pwd 密码（加密后的）
 	 * @return 1）认证失败：“0” 2）认证成功：数据库中登录记录号
 	 */
-	public String loginAuthenticate(String account, String pwd){
+	/*public String loginAuthenticate(String account, String pwd){
 		//TODO 
 		return HttpClientAPI.loginAuth(account, pwd);
-	}
+	}*/
 	
 	/**
-	 * 设置登录信息
+	 * 更新登录标志、登录帐号、登录ID
 	 * @param account 用户名
 	 * @param recordId 数据库中登录记录号
 	 */
@@ -167,16 +184,19 @@ public class AppContext extends Application{
 	}
 	
 	/**
-	 * 记住用户名和密码，保存到磁盘
+	 * 根据isRememberMe：
+	 * true：保存记忆标志、用户名、密码(加密后)、服务器IP到磁盘
+	 * false: 将磁盘中上述信息置空
 	 * @param isRememberMe 
 	 * @param account 用户名
 	 * @param pwd 密码（加密后）
 	 */
-	public void saveLoginInfo(boolean isRememberMe, String account, String pwd){
+	public void saveLoginInfoParams(boolean isRememberMe, String account, String pwd, String serverIP){
 		if(isRememberMe){
 			SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 			sharedPreferences.edit().putString("account", account);
 			sharedPreferences.edit().putString("password", pwd);
+			sharedPreferences.edit().putString("severip", serverIP);
 			sharedPreferences.edit().putString("isRememberMe", "true");
 			sharedPreferences.edit().commit();
 		}else{
@@ -185,11 +205,11 @@ public class AppContext extends Application{
 	}
 	
 	/**
-	 * 保存登录参数
+	 * 保存单个登录参数到磁盘
 	 * @param key
 	 * @param value
 	 */
-	public void setLoginInfoParams(String key, String value){
+	public void saveLoginInfoParams(String key, String value){
 		SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 		sharedPreferences.edit().putString(key, value);
 		sharedPreferences.edit().commit();
@@ -213,6 +233,7 @@ public class AppContext extends Application{
 		sharedPreferences.edit().putString("account", "");
 		sharedPreferences.edit().putString("password", "");
 		sharedPreferences.edit().putString("isRememberMe", "");
+		sharedPreferences.edit().putString("severip", "");
 		sharedPreferences.edit().commit();
 	}
 	

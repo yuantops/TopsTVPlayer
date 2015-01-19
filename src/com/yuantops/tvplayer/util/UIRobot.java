@@ -2,10 +2,15 @@ package com.yuantops.tvplayer.util;
 
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
+import com.yuantops.tvplayer.ui.HomeActivity;
+import com.yuantops.tvplayer.ui.VideoDisplayActivity;
+import com.yuantops.tvplayer.ui.VideoPlayActivity;
+import com.yuantops.tvplayer.ui.VideoPlayActivity_Vitamio;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 /**
  * 处理与UI相关的工具类，包括Activity跳转、显示Dialog、显示Toast
@@ -59,4 +64,15 @@ public class UIRobot {
 			AppManager.getInstance().finishActivity();
 		}
 	}
+	
+	/**
+	 * 显示提示信息
+	 * @param mContext
+	 * @param string
+	 */
+	public static void showToast(Context mContext, String string) {
+		if(!StringUtils.isEmpty(string)) {
+			Toast.makeText(mContext, string, Toast.LENGTH_SHORT).show();
+		}
+	} 
 }

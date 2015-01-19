@@ -25,6 +25,12 @@ public class StringUtils {
 	// SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	// private final static SimpleDateFormat dateFormater2 = new
 	// SimpleDateFormat("yyyy-MM-dd");
+	
+	private static final Pattern IPAddresser = Pattern.compile(
+			"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
 	private final static ThreadLocal<SimpleDateFormat> dateFormater = new ThreadLocal<SimpleDateFormat>() {
 		@Override
@@ -167,6 +173,18 @@ public class StringUtils {
 		return emailer.matcher(email).matches();
 	}
 
+	/**
+	 * 判断是不是合法的IP地址
+	 * @param ip
+	 * @return
+	 */
+	public static boolean isValidIPAddress(String ip) {
+		if (ip == null || ip.equals("")) {
+			return false;
+		}
+		return IPAddresser.matcher(ip).matches();
+	}
+	
 	/**
 	 * 字符串转整数
 	 * 
