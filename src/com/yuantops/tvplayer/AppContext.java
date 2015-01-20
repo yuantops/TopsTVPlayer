@@ -32,7 +32,8 @@ public class AppContext extends Application{
 	
 	private String IPAddress = null;
 	private String deviceType = Build.MODEL;
-	private String serverIPAddress = null;
+	private String webServerIP = null;
+	private String socketServerIP = null;
 	
 	@Override
 	public void onCreate(){
@@ -77,9 +78,19 @@ public class AppContext extends Application{
 	
 	
 	/**
+	 * 设置web服务器,socket服务器IP地址
+	 * @param webServerIP
+	 * @param socketServerIP
+	 */
+	public void setServerIP(String webServerIP, String socketServerIP) {
+		this.webServerIP = webServerIP;
+		this.socketServerIP = socketServerIP;
+	}
+	
+	/**
 	 * 初始化本机IP地址
 	 */
-	public void initIPAddress(){
+	public void initClientIP(){
 		WifiManager wifiMan = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		WifiInfo wifiInf = wifiMan.getConnectionInfo();
 		int ipAddress = wifiInf.getIpAddress();
@@ -96,7 +107,7 @@ public class AppContext extends Application{
 	 * 获取本机IP地址
 	 * @return IP
 	 */
-	public String getLocalIP(){
+	public String getClientIP(){
 		return this.IPAddress;
 	}
 	
@@ -128,21 +139,21 @@ public class AppContext extends Application{
 	public String getloginRecordId(){
 		return this.loginRecordId;
 	}
-	
+			
 	/**
-	 * 设置服务器IP地址
-	 * @param ip
+	 * 获取web服务器IP地址
+	 * @return
 	 */
-	public void setServerIP(String ip) {
-		this.serverIPAddress = ip;
+	public String getWebServerIP() {
+		return this.webServerIP;
 	}
 	
 	/**
-	 * 获取服务器IP地址
+	 * 获取socket服务器IP地址
 	 * @return
 	 */
-	public String getServerIP() {
-		return this.serverIPAddress;
+	public String getSocketServerIP() {
+		return this.socketServerIP;
 	}
 	
 	/**
@@ -154,7 +165,7 @@ public class AppContext extends Application{
 			return;
 		}
 		//TODO 在服务器上注销此次登录
-		HttpClientAPI.logout(this.serverIPAddress, this.loginRecordId);
+		HttpClientAPI.logout(this.webServerIP, this.loginRecordId);
 		
 		this.isLogin = false;
 		this.loginAccount = null;
@@ -177,7 +188,7 @@ public class AppContext extends Application{
 	 * @param account 用户名
 	 * @param recordId 数据库中登录记录号
 	 */
-	public void setLoginInfo(String account, String recordId){
+	public void setLogged(String account, String recordId){
 		this.isLogin = true;
 		this.loginAccount = account;
 		this.loginRecordId = recordId;

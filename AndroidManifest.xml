@@ -32,6 +32,8 @@
         </activity>
         <activity android:name="com.yuantops.tvplayer.ui.MainActivity" >
         </activity>
+        <activity android:name="com.yuantops.tvplayer.ui.HomeActivity" >
+        </activity>
     </application>
 
 </manifest>

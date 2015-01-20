@@ -47,7 +47,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	private Button serverIPRefresh;
 	private ImageView loginQRCode;// 登录二维码，主要包含当前设备的IP地址
 	
-	private AppContext globalAppContext = null;
+	private AppContext appContext = null;
 	
 	private ServiceConnection conn = new ServiceConnection() {
 		@Override
@@ -75,14 +75,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 			
 			String loginAccount = params.getValue("ACCOUNT");
 			String loginRecordId = params.getValue("RECORDID");
-			//密码 为空:第三方登录(二维码扫描); 非空:本机以http方式登录
-			//第三方登录，不保存帐号、密码信息到磁盘
-			if(!StringUtils.isEmpty(params.getValue("PASSWORD"))) {
+			//密码为空:第三方登录(二维码扫描),不保存帐号、密码到磁盘; 
+			//非空:本机以http方式登录，判断是否勾选"记住密码"
+			if((!StringUtils.isEmpty(params.getValue("PASSWORD"))) && checkbox.isChecked()) {
 				String loginPassword = params.getValue("PASSWORD");
-				globalAppContext.saveLoginInfoParams(true, loginAccount, loginPassword, globalAppContext.getServerIP());
+				appContext.saveLoginInfoParams(true, loginAccount, loginPassword, appContext.getWebServerIP());
 			}
 
-			globalAppContext.setLoginInfo(loginAccount, loginRecordId);
+			appContext.setLogged(loginAccount, loginRecordId);
 			UIRobot.gotoHomePage(LoginActivity.this);
 		}		
 	};
@@ -93,12 +93,12 @@ public class LoginActivity extends Activity implements OnClickListener {
 		this.setContentView(R.layout.activity_login);
 		AppManager.getInstance().addActivity(this);
 		
-		globalAppContext = (AppContext) this.getApplication();
-		globalAppContext.initIPAddress();
+		appContext = (AppContext) this.getApplication();
+		appContext.initClientIP();
 		initViewComponents();
 						
 		//如果a)网络可用且b)服务器IP合法，1) 以绑定方式启动service 2)注册处理登录的broadcast receiver
-		if(globalAppContext.isNetworkConnected() &&  StringUtils.isValidIPAddress(globalAppContext.getServerIP())) {
+		if(appContext.isNetworkConnected() &&  StringUtils.isValidIPAddress(appContext.getSocketServerIP())) {
 			Intent intent = new Intent(this, AppService.class);
 	        bindService(intent, conn, Context.BIND_AUTO_CREATE);
 	        mBound = true;
@@ -141,14 +141,16 @@ public class LoginActivity extends Activity implements OnClickListener {
 		serverIPRefresh.setOnClickListener(this);
 
 		//取出本机IP,设备类型,服务器IP地址
-		deviceTextView.setText(globalAppContext.getDeviceType());
-		ipTextView.setText(globalAppContext.getLocalIP());
-		serverIPEditText.setText(globalAppContext.getServerIP());
+		deviceTextView.setText(appContext.getDeviceType());
+		ipTextView.setText(appContext.getClientIP());
+		serverIPEditText.setText(appContext.getWebServerIP());
 		
 		//如果上次登录时选择了“记住我”，那么显示上次登录的帐号，密码，勾选复选框
-		if(globalAppContext.getLoginInfoParams("isRememberMe").equals("true")) {
-			acountEditText.setText(globalAppContext.getLoginInfoParams("account"));
-			pwdEditText.setText(globalAppContext.getLoginInfoParams("password"));
+		if(appContext.getLoginInfoParams("isRememberMe").equals("true")) {
+			Log.v(TAG, "retrieved from last login \n account:"+appContext.getLoginInfoParams("account"));
+			acountEditText.setText(appContext.getLoginInfoParams("account"));
+			Log.v(TAG, "retrieved from last login \n password:"+appContext.getLoginInfoParams("password"));
+			pwdEditText.setText(appContext.getLoginInfoParams("password"));
 			checkbox.setChecked(true);
 		}
 	}
@@ -160,7 +162,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 			String loginPassword = pwdEditText.getText().toString();
 			String severIP = serverIPEditText.getText().toString();
 			
-			if(!globalAppContext.isNetworkConnected()) {
+			if(!appContext.isNetworkConnected()) {
 				//如果无网络连接，提示无法请稍候再试
 				UIRobot.showToast(this, "No network! Please try again later.");
 			} else if(StringUtils.isEmpty(loginAccount)) {
@@ -175,7 +177,7 @@ public class LoginActivity extends Activity implements OnClickListener {
  			} else {
  				
  				//更新serverIP
- 				globalAppContext.setServerIP(severIP);
+ 				appContext.setServerIP(severIP,severIP);
  				
 				//如果还没绑定后台服务，绑定后台服务，并注册登录broadcast receiver
 				if(!mBound || !mRegistered) {
@@ -215,12 +217,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 		
 		@Override
 		public void run() {
-			String recordID = HttpClientAPI.loginAuth(globalAppContext.getServerIP(), mAccount, mPassword);
+			String recordID = HttpClientAPI.loginAuth(appContext.getWebServerIP(), mAccount, mPassword);
 			DLNABody loginAuthResult = new DLNABody();
 			loginAuthResult.addRecord("ACTION", "LOGIN");
 			loginAuthResult.addRecord("ACCOUNT", mAccount);
 			loginAuthResult.addRecord("PASSWORD", mPassword);
 			loginAuthResult.addRecord("RECORDID", recordID);
+			
+			Log.v(TAG, "body content in Intent:\n"+loginAuthResult.printDLNABody());
 			Intent intent = new Intent(SocketMsgDispatcher.LOGIN_BROADCAST);
 			intent.putExtra("Params", loginAuthResult);
 			mContext.sendBroadcast(intent);

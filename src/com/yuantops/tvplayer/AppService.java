@@ -28,12 +28,14 @@ public class AppService extends Service {
 	
 	@Override
 	public void onCreate() {
+
+		Log.v(TAG, "onCreate()");
 		// The service is being created
 		super.onCreate();
 		myBinder = new MyBinder();
 		
 		//初始化socketClient，int()方法会新开后台线程监听socket连接
-		socketClient = new SocketClient(((AppContext)this.getApplication()).getServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
+		socketClient = new SocketClient(((AppContext)this.getApplication()).getSocketServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
 		socketClient.init();
 		Log.v(TAG, "onCreate()");
 	}
@@ -41,12 +43,14 @@ public class AppService extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
+		Log.v(TAG, "onBind()");
 		return myBinder;
 	}
 
 	@Override
 	public boolean onUnbind(Intent intent) {
 		// All clients have unbound with unbindService()
+		Log.v(TAG, "onUnBind()");
 		return false;
 	}
 
