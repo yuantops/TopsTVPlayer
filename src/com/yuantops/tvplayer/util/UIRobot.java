@@ -24,6 +24,7 @@ public class UIRobot {
 	public static void gotoHomePage (Context mContext) {
 		Intent intent = new Intent(mContext, HomeActivity.class);
 		mContext.startActivity(intent);
+		AppManager.getInstance().finishActivity((Activity)mContext);
 	}
 	
 	/**

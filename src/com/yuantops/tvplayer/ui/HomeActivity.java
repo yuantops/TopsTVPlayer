@@ -1,5 +1,6 @@
 package com.yuantops.tvplayer.ui;
 
+import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.R;
 import com.yuantops.tvplayer.bean.DLNABody;
 
@@ -16,6 +17,6 @@ public class HomeActivity extends Activity {
 		Log.v(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_main);
-			
+		AppManager.getInstance().addActivity(this);			
 	}
 }

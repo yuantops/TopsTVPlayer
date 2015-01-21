@@ -1,13 +1,16 @@
 package com.yuantops.tvplayer.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.yuantops.tvplayer.AppContext;
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.AppService;
 import com.yuantops.tvplayer.R;
 import com.yuantops.tvplayer.api.HttpClientAPI;
 import com.yuantops.tvplayer.bean.DLNABody;
-import com.yuantops.tvplayer.bean.NetworkConstants;
 import com.yuantops.tvplayer.util.CyptoUtils;
+import com.yuantops.tvplayer.util.GetBitmap;
 import com.yuantops.tvplayer.util.SocketMsgDispatcher;
 import com.yuantops.tvplayer.util.StringUtils;
 import com.yuantops.tvplayer.util.UIRobot;
@@ -19,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -76,14 +80,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 			String loginAccount = params.getValue("ACCOUNT");
 			String loginRecordId = params.getValue("RECORDID");
 			//密码为空:第三方登录(二维码扫描),不保存帐号、密码到磁盘; 
-			//非空:本机以http方式登录，判断是否勾选"记住密码"
 			String chec = checkbox.isChecked() ? "true":"false";
 			Log.v(TAG, "checkbox is checked"+chec);
 			
 			if((!StringUtils.isEmpty(params.getValue("PASSWORD"))) ) {
 				Log.v(TAG, "save login params in Broadcast Receiver");
 				String loginPassword = params.getValue("PASSWORD");
-				appContext.saveLoginInfoParams(checkbox.isChecked(), loginAccount, loginPassword, appContext.getWebServerIP());
+				appContext.saveLoginParams(checkbox.isChecked(), loginAccount, loginPassword, appContext.getWebServerIP());
 			}
 
 			appContext.setLogged(loginAccount, loginRecordId);
@@ -100,9 +103,12 @@ public class LoginActivity extends Activity implements OnClickListener {
 		appContext = (AppContext) this.getApplication();
 		appContext.initClientIP();
 		initViewComponents();
+		
+		Log.v(TAG, "appContext.getSocketServerIP(): "+appContext.getSocketServerIP());
 						
 		//如果a)网络可用且b)服务器IP合法，1) 以绑定方式启动service 2)注册处理登录的broadcast receiver
 		if(appContext.isNetworkConnected() &&  StringUtils.isValidIPAddress(appContext.getSocketServerIP())) {
+			Log.v(TAG, "try to bind service");
 			Intent intent = new Intent(this, AppService.class);
 	        bindService(intent, conn, Context.BIND_AUTO_CREATE);
 	        mBound = true;
@@ -137,7 +143,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 		registerButton = (Button) findViewById(R.id.loginregedit);
 		checkbox = (CheckBox) findViewById(R.id.checkbox);		
 		serverIPEditText = (EditText) findViewById(R.id.server_ip);
-		serverIPRefresh = (Button) findViewById(R.id.save_server_ip);		
+		serverIPRefresh = (Button) findViewById(R.id.save_server_ip);	
+		loginQRCode = (ImageView) findViewById(R.id.login_QR);
 		
 		//添加OnClickListener
 		loginButton.setOnClickListener(this);
@@ -150,11 +157,23 @@ public class LoginActivity extends Activity implements OnClickListener {
 		
 		
 		//如果上次登录时选择了“记住我”，那么显示上次登录的帐号，密码，勾选复选框
-		if(appContext.getLoginInfoParams("isRememberMe").equals("true")) {
-			acountEditText.setText(appContext.getLoginInfoParams("account"));
-			pwdEditText.setText(CyptoUtils.decode(AppContext.ENCRYPT_KEY, appContext.getLoginInfoParams("password")));
-			serverIPEditText.setText(appContext.getLoginInfoParams("severip"));
+		if(appContext.getLoginParams("isRememberMe").equals("true")) {
+			acountEditText.setText(appContext.getLoginParams("account"));
+			pwdEditText.setText(CyptoUtils.decode(AppContext.ENCRYPT_KEY, appContext.getLoginParams("password")));
+			serverIPEditText.setText(appContext.getLoginParams("severip"));
 			checkbox.setChecked(true);
+			
+			appContext.setServerIP(appContext.getLoginParams("severip"),"124.16.138.41"); 
+			
+			//显示二维码
+			Map<String, String> QRParams = new HashMap<String, String>();
+			QRParams.put("AC", "LOGIN");
+			QRParams.put("IP", appContext.getClientIP());
+			String QRLoginStr = HttpClientAPI.getQRUrl(appContext.getLoginParams("severip"), QRParams);
+			Log.v(TAG, "QR String:\n"+QRLoginStr);
+			Bitmap resizedBitmap = Bitmap.createScaledBitmap(
+					GetBitmap.createQRImage(QRLoginStr), 400, 400, false);
+			loginQRCode.setImageBitmap(resizedBitmap);
 		}
 	}
 
@@ -180,7 +199,7 @@ public class LoginActivity extends Activity implements OnClickListener {
  			} else {
  				
  				//更新serverIP
- 				appContext.setServerIP(severIP,severIP); 				
+ 				appContext.setServerIP(severIP,"124.16.138.41"); 				
  				
 				//如果还没绑定后台服务，绑定后台服务，并注册登录broadcast receiver
 				if(!mBound || !mRegistered) {
@@ -198,10 +217,24 @@ public class LoginActivity extends Activity implements OnClickListener {
 		} else if(v.getId() == R.id.loginregedit) {
 			UIRobot.gotoRegisterPage(this);
 			
-		} else if(v.getId() == R.id.save_server_ip) {
+		} else if(v.getId() == R.id.save_server_ip) {			
+			
 			if(StringUtils.isValidIPAddress(serverIPEditText.getText().toString())) {
+				
+				if(!serverIPEditText.getText().toString().equals(appContext.getWebServerIP())) {
+					//更新二维码
+					Map<String, String> QRParams = new HashMap<String, String>();
+					QRParams.put("AC", "LOGIN");
+					QRParams.put("IP", appContext.getClientIP());
+					String QRLoginStr = HttpClientAPI.getQRUrl(serverIPEditText.getText().toString(), QRParams);
+					Log.v(TAG, "QR String:\n"+QRLoginStr);
+					Bitmap resizedBitmap = Bitmap.createScaledBitmap(
+							GetBitmap.createQRImage(QRLoginStr), 400, 400, false);
+					loginQRCode.setImageBitmap(resizedBitmap);
+				}
+				
 				//保存服务器信息到磁盘
-				appContext.saveLoginInfoParams("severip", serverIPEditText.getText().toString());
+				appContext.saveLoginParams("severip", serverIPEditText.getText().toString());
 				//如果还未绑定后台服务、未注册广播接收器，分别绑定、注册
 				if (!mBound) {
 					Intent intent = new Intent(this, AppService.class);

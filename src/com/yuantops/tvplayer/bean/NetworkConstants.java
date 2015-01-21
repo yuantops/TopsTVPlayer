@@ -31,4 +31,5 @@ public class NetworkConstants {
 	public static final String GET_CHANNEL_STATUS_SERVLET = "";
 	public static final String COMMENT_SERVLET = "";
 	public static final String PLAY_RECORD_SERVLET = "";
+	public static final String SCAN_QR_SERVLET = "san";
 }

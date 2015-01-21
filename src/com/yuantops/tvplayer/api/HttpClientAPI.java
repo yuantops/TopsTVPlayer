@@ -49,9 +49,29 @@ public class HttpClientAPI {
 		}
 
 		return url.toString().replace("?&", "?");
+	}	
+	
+	/**
+	 * 返回形如http://192.168.162.164:8080/WebServer的地址
+	 * @param ip Web服务器IP
+	 * @return
+	 */
+	public static String getRootUrl(String ip) {
+		return "http://" + ip + ":"+ NetworkConstants.WEB_SERVER_PORT  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.WEB_SERVER_APP_NAME;
+	}
+
+	
+	/**
+	 * 返回QR二维码上的网址字符串
+	 * @param serverip
+	 * @param params
+	 * @return
+	 */
+	public static String getQRUrl(String serverip, Map<String, String> params) {
+		String baseUrl =  getRootUrl(serverip) + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.SCAN_QR_SERVLET;
+		return makeURL(baseUrl, params);
 	}
 	
-		
 	/**
 	 * @param url 需要访问的URL
 	 * @return 服务器返回的字符串
@@ -128,7 +148,8 @@ public class HttpClientAPI {
 	 * @return 认证失败："0"; 认证成功：数据库中登录记录号
 	 */
 	public static String loginAuth(String serverip, String account, String CyptedPwd){
-		String baseURL = "http://" + serverip + ":"+ NetworkConstants.WEB_SERVER_PORT  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.WEB_SERVER_APP_NAME  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.LOGIN_SERVLET;
+		//String baseURL = "http://" + serverip + ":"+ NetworkConstants.WEB_SERVER_PORT  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.WEB_SERVER_APP_NAME  + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.LOGIN_SERVLET;
+		String baseURL = getRootUrl(serverip) + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.LOGIN_SERVLET;
 		
 		Map<String, String> loginParams = new HashMap<String, String>();
 		loginParams.put("Account", account);
@@ -136,6 +157,9 @@ public class HttpClientAPI {
 		
 		return httpGet(makeURL(baseURL, loginParams));
 	}
+	
+	
+	
 	
 	/**
 	 * 用户注销

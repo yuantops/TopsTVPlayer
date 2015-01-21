@@ -37,6 +37,10 @@
         
         <activity android:name="com.yuantops.tvplayer.ui.RegisterActivity" >
         </activity>
+        
+        <service android:name=".AppService">
+            </service>
+        
     </application>
 
 </manifest>

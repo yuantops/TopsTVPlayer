@@ -204,7 +204,7 @@ public class AppContext extends Application{
 	 * @param account 用户名
 	 * @param pwd 密码（加密后）
 	 */
-	public void saveLoginInfoParams(boolean isRememberMe, String account, String pwd, String serverIP){
+	public void saveLoginParams(boolean isRememberMe, String account, String pwd, String serverIP){
 		if(isRememberMe){
 			SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -223,7 +223,7 @@ public class AppContext extends Application{
 	 * @param key
 	 * @param value
 	 */
-	public void saveLoginInfoParams(String key, String value){
+	public void saveLoginParams(String key, String value){
 		SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putString(key, value);
@@ -235,7 +235,7 @@ public class AppContext extends Application{
 	 * @param key 
 	 * @return value
 	 */
-	public String getLoginInfoParams(String key){
+	public String getLoginParams(String key){
 		SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 		return sharedPreferences.getString(key, "");
 	}
