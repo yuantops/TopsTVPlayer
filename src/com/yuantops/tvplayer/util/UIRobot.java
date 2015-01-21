@@ -3,6 +3,7 @@ package com.yuantops.tvplayer.util;
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
 import com.yuantops.tvplayer.ui.HomeActivity;
+import com.yuantops.tvplayer.ui.RegisterActivity;
 import com.yuantops.tvplayer.ui.VideoDisplayActivity;
 import com.yuantops.tvplayer.ui.VideoPlayActivity;
 import com.yuantops.tvplayer.ui.VideoPlayActivity_Vitamio;
@@ -22,6 +23,15 @@ public class UIRobot {
 	
 	public static void gotoHomePage (Context mContext) {
 		Intent intent = new Intent(mContext, HomeActivity.class);
+		mContext.startActivity(intent);
+	}
+	
+	/**
+	 * 跳转到注册页面
+	 * @param mContext
+	 */
+	public static void gotoRegisterPage (Context mContext) {
+		Intent intent = new Intent(mContext, RegisterActivity.class);
 		mContext.startActivity(intent);
 	}
 	

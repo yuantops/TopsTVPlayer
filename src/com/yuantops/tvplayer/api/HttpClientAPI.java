@@ -70,20 +70,20 @@ public class HttpClientAPI {
 				
 		do{
 			try{
-				Log.v(TAG, "here1");
+				//Log.v(TAG, "here1");
 				httpClient = new DefaultHttpClient(HttpParameters);
-				Log.v(TAG, "here2");
+				//Log.v(TAG, "here2");
 				Log.v(TAG, "postUrl:   "+url);				
 				httpPost = new HttpPost(url);
-				Log.v(TAG, "here3");
+				//Log.v(TAG, "here3");
 				httpResp = httpClient.execute(httpPost);
-				Log.v(TAG, "here4");
+				//Log.v(TAG, "here4");
 				httpRespString = EntityUtils.toString(httpResp.getEntity());
-				Log.v(TAG, "here5");
-				Log.v(TAG, httpRespString);
+				//Log.v(TAG, "here5");
+				//Log.v(TAG, httpRespString);
 				break;
 			}catch(SocketTimeoutException e){
-				Log.v(TAG, "here6");
+				//Log.v(TAG, "here6");
 				time++;
 				if(time < RETRY_TIME) {
 					try {
@@ -104,7 +104,7 @@ public class HttpClientAPI {
 				// 发生致命的异常，可能是协议不对或者返回的内容有问题
 				e.printStackTrace();
 			} finally {
-				Log.v(TAG, "here7");
+				//Log.v(TAG, "here7");
 				// 释放连接
 				if(httpResp.getEntity() != null){
 					try {

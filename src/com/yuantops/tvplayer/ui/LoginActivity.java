@@ -77,9 +77,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 			String loginRecordId = params.getValue("RECORDID");
 			//密码为空:第三方登录(二维码扫描),不保存帐号、密码到磁盘; 
 			//非空:本机以http方式登录，判断是否勾选"记住密码"
-			if((!StringUtils.isEmpty(params.getValue("PASSWORD"))) && checkbox.isChecked()) {
+			String chec = checkbox.isChecked() ? "true":"false";
+			Log.v(TAG, "checkbox is checked"+chec);
+			
+			if((!StringUtils.isEmpty(params.getValue("PASSWORD"))) ) {
+				Log.v(TAG, "save login params in Broadcast Receiver");
 				String loginPassword = params.getValue("PASSWORD");
-				appContext.saveLoginInfoParams(true, loginAccount, loginPassword, appContext.getWebServerIP());
+				appContext.saveLoginInfoParams(checkbox.isChecked(), loginAccount, loginPassword, appContext.getWebServerIP());
 			}
 
 			appContext.setLogged(loginAccount, loginRecordId);
@@ -139,18 +143,17 @@ public class LoginActivity extends Activity implements OnClickListener {
 		loginButton.setOnClickListener(this);
 		registerButton.setOnClickListener(this);
 		serverIPRefresh.setOnClickListener(this);
-
-		//取出本机IP,设备类型,服务器IP地址
+				
+		//取出本机IP,设备类型
 		deviceTextView.setText(appContext.getDeviceType());
 		ipTextView.setText(appContext.getClientIP());
-		serverIPEditText.setText(appContext.getWebServerIP());
+		
 		
 		//如果上次登录时选择了“记住我”，那么显示上次登录的帐号，密码，勾选复选框
 		if(appContext.getLoginInfoParams("isRememberMe").equals("true")) {
-			Log.v(TAG, "retrieved from last login \n account:"+appContext.getLoginInfoParams("account"));
 			acountEditText.setText(appContext.getLoginInfoParams("account"));
-			Log.v(TAG, "retrieved from last login \n password:"+appContext.getLoginInfoParams("password"));
-			pwdEditText.setText(appContext.getLoginInfoParams("password"));
+			pwdEditText.setText(CyptoUtils.decode(AppContext.ENCRYPT_KEY, appContext.getLoginInfoParams("password")));
+			serverIPEditText.setText(appContext.getLoginInfoParams("severip"));
 			checkbox.setChecked(true);
 		}
 	}
@@ -177,7 +180,7 @@ public class LoginActivity extends Activity implements OnClickListener {
  			} else {
  				
  				//更新serverIP
- 				appContext.setServerIP(severIP,severIP);
+ 				appContext.setServerIP(severIP,severIP); 				
  				
 				//如果还没绑定后台服务，绑定后台服务，并注册登录broadcast receiver
 				if(!mBound || !mRegistered) {
@@ -193,9 +196,23 @@ public class LoginActivity extends Activity implements OnClickListener {
 				new LoginAuthThread(this,loginAccount,CyptoUtils.encode(AppContext.ENCRYPT_KEY, loginPassword)).start();
  			}			
 		} else if(v.getId() == R.id.loginregedit) {
+			UIRobot.gotoRegisterPage(this);
 			
 		} else if(v.getId() == R.id.save_server_ip) {
-			
+			if(StringUtils.isValidIPAddress(serverIPEditText.getText().toString())) {
+				//保存服务器信息到磁盘
+				appContext.saveLoginInfoParams("severip", serverIPEditText.getText().toString());
+				//如果还未绑定后台服务、未注册广播接收器，分别绑定、注册
+				if (!mBound) {
+					Intent intent = new Intent(this, AppService.class);
+			        bindService(intent, conn, Context.BIND_AUTO_CREATE);
+			        mBound = true;
+				}
+				if (!mRegistered) {
+					registerReceiver(loginBrdReceiver, intentFilter);
+			        mRegistered = true;
+				}
+			}
 		}
 	}
 	

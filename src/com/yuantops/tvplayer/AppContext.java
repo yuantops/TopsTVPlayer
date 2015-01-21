@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
 
 /** 
  * 全局上下文：保存调用全局配置，调用网络访问api
@@ -19,6 +20,7 @@ import android.os.Build;
  * @created Dec 28, 2014 2:10:53 PM
  */
 public class AppContext extends Application{
+	private static final String TAG = AppContext.class.getSimpleName();
 
 	public static final int NETTYPE_WIFI = 0x01;
 	public static final int NETTYPE_CMWAP = 0x02;
@@ -204,15 +206,16 @@ public class AppContext extends Application{
 	 */
 	public void saveLoginInfoParams(boolean isRememberMe, String account, String pwd, String serverIP){
 		if(isRememberMe){
-			SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-			sharedPreferences.edit().putString("account", account);
-			sharedPreferences.edit().putString("password", pwd);
-			sharedPreferences.edit().putString("severip", serverIP);
-			sharedPreferences.edit().putString("isRememberMe", "true");
-			sharedPreferences.edit().commit();
+			SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString("account", account);
+			editor.putString("password", pwd);
+			editor.putString("severip", serverIP);
+			editor.putString("isRememberMe", "true");
+			editor.commit();			
 		}else{
 			clearLoginInfo();
-		}
+		}		
 	}
 	
 	/**
@@ -221,9 +224,10 @@ public class AppContext extends Application{
 	 * @param value
 	 */
 	public void saveLoginInfoParams(String key, String value){
-		SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-		sharedPreferences.edit().putString(key, value);
-		sharedPreferences.edit().commit();
+		SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putString(key, value);
+		editor.commit();
 	}
 	
 	/**
@@ -232,7 +236,7 @@ public class AppContext extends Application{
 	 * @return value
 	 */
 	public String getLoginInfoParams(String key){
-		SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+		SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 		return sharedPreferences.getString(key, "");
 	}
 	
@@ -240,12 +244,13 @@ public class AppContext extends Application{
 	 * 清除保存在本地的登录参数:
 	 */
 	public void clearLoginInfo(){
-		SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-		sharedPreferences.edit().putString("account", "");
-		sharedPreferences.edit().putString("password", "");
-		sharedPreferences.edit().putString("isRememberMe", "");
-		sharedPreferences.edit().putString("severip", "");
-		sharedPreferences.edit().commit();
+		SharedPreferences sharedPreferences = this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putString("account", "");
+		editor.putString("password", "");
+		editor.putString("isRememberMe", "");
+		editor.putString("severip", "");
+		editor.commit();
 	}
 	
 }
