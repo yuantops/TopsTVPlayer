@@ -32,10 +32,13 @@ public class AppContext extends Application{
 	private String loginAccount = null;
 	private String loginRecordId = null;
 	
-	private String IPAddress = null;
-	private String deviceType = Build.MODEL;
 	private String webServerIP = null;
 	private String socketServerIP = null;
+	
+	private String IPAddress = null;
+	private String IPAddress_hex = null;
+	private String deviceType = null;
+	
 	
 	@Override
 	public void onCreate(){
@@ -100,17 +103,59 @@ public class AppContext extends Application{
 		
 		if(!StringUtils.isEmpty(ip)){
 			this.IPAddress = ip;
+			this.IPAddress_hex = get_Hex_subnet(ip);
 		}else{
 			this.IPAddress = "0.0.0.0";
+			this.IPAddress_hex = "00000000";
+		}
+	}
+	
+	private String get_Hex_subnet(String ip) {
+		StringBuffer subnet = new StringBuffer();
+		try {
+			for (String s : ip.split("\\.")) {
+				subnet.append(former(Integer.toHexString(Integer.parseInt(s))));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return subnet.toString();
+	}
+	
+	public String former(String hex) {
+		if (hex.length() == 1) {
+			return "0" + hex;
+		} else {
+			return hex;
 		}
 	}
 		
+	
+	/**
+	 * 初始化App的一系列变量: IP、八进制形式的IP、 设备型号
+	 *
+	 */
+	public void initAppEnv() {
+		//设备IP、
+		initClientIP();
+		deviceType = Build.MODEL;
+	}
+	
+	
 	/**
 	 * 获取本机IP地址
 	 * @return IP
 	 */
 	public String getClientIP(){
 		return this.IPAddress;
+	}
+	
+	/**
+	 * 获取本机IP地址_hex格式
+	 * @return
+	 */
+	public String getClientIP_hex() {
+		return this.IPAddress_hex;
 	}
 	
 	/**

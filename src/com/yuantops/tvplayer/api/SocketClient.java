@@ -171,36 +171,38 @@ public class SocketClient {
 						Charset charset = Charset.forName("UTF-8");
 						CharsetDecoder decoder = charset.newDecoder();
 						CharBuffer charBuffer = null ;
-						do {
-							readBytes = 0;	
-							readBuffer.clear();
-							readBytes = ((SocketChannel) key.channel()).read(readBuffer);
-							
-							if (readBytes < 0) {
-				        		((SocketChannel) key.channel()).close();
-				        		Log.d(TAG, "End of Stream caught.");
-				        		return;
-				        	} else if (readBytes == 0) {
-				        		break;
-				        	} else {
-				        		readBuffer.flip();
-								if (readBuffer.remaining() != 0) {									
-									try {										
-										charBuffer = decoder.decode(readBuffer);										
-									} catch (CharacterCodingException e) {
-										Log.d(TAG,
-												"Exception caught when decoding from bytes");
-										e.printStackTrace();
-									}
-								}			        		
-				        	}							
-						} while (readBytes>0);
+
+						readBytes = 0;
+						readBuffer.clear();
+						readBytes = ((SocketChannel) key.channel())
+								.read(readBuffer);
+
+						if (readBytes < 0) {
+							((SocketChannel) key.channel()).close();
+							Log.d(TAG, "End of Stream caught.");
+							return;
+						} else if (readBytes == 0) {
+							break;
+						} else {
+							readBuffer.flip();
+							if (readBuffer.remaining() != 0) {
+								try {
+									charBuffer = decoder.decode(readBuffer);
+								} catch (CharacterCodingException e) {
+									Log.d(TAG,
+											"Exception caught when decoding from bytes");
+									e.printStackTrace();
+								}
+							}
+						}
+						
 						
 						if (charBuffer != null) {
-							SocketMsgDispatcher.processMsg(mContext,
-									charBuffer.toString());
 							Log.v(TAG, "decoded string from socket>>>>>>\n"
 									+ charBuffer.toString());
+							SocketMsgDispatcher.processMsg(mContext,
+									charBuffer.toString());
+							
 						}
 					} catch (IOException e) {
 						System.out
@@ -221,6 +223,7 @@ public class SocketClient {
 	 * @param message
 	 */
 	public void sendMessage(String str) {
+		Log.v(TAG, "message send BY socketClient:\n" + str);
 		new sendMessageThread(str).start();
 	}
 

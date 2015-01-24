@@ -101,7 +101,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 		AppManager.getInstance().addActivity(this);
 		
 		appContext = (AppContext) this.getApplication();
-		appContext.initClientIP();
+		//appContext.initClientIP();
+		appContext.initAppEnv();
 		initViewComponents();
 		
 		Log.v(TAG, "appContext.getSocketServerIP(): "+appContext.getSocketServerIP());
