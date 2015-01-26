@@ -24,6 +24,8 @@ import android.util.Log;
 public class AppService extends Service {
 	private static final String TAG = AppService.class.getSimpleName();
 	
+	private static final int TRY_TIME_LIMIT = 3;
+	
 	private MyBinder myBinder;	
 	private SocketClient socketClient;
 	private AppContext appContext;
@@ -40,15 +42,20 @@ public class AppService extends Service {
 		//初始化socketClient，int()方法会新开后台线程监听socket连接
 		socketClient = new SocketClient(appContext.getSocketServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
 		socketClient.init();
-		while(!socketClient.isPrepared()) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		
+		for(int count = 0; count < TRY_TIME_LIMIT; count++) {
+			if (socketClient.isPrepared()) {
+				register(socketClient);
+				break;
+			} else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		register(socketClient);
-		Log.v(TAG, "onCreate()");
+		Log.d(TAG, "cannot connect socket server...");
 	}
 	
 	/**

@@ -22,6 +22,10 @@ public class VideoList implements Serializable{
 		list = new ArrayList<Video>();
 	}
 	
+	public int getSize() {
+		return list.size();
+	}
+	
 	/**
 	 * 从json格式的字符串中填充VideoList
 	 * @param jsonString
@@ -51,10 +55,10 @@ public class VideoList implements Serializable{
 				v.setType(jsonObject.getString("type"));
 				
 				v.setPosterUrl(jsonObject.getString("image_url"));
-				v.setHighDefiUrl(jsonObject.getString("highdefinition_url"));
-				v.setStandardDefiUrl(jsonObject.getString("standarddefinition_url"));
-				v.setSuperDefiUrl(jsonObject.getString("superdefinition_url"));
-				v.setBroadcastUrl(jsonObject.getString("broadcast_url"));
+				v.setHighDefiUrl(jsonObject.getString("high_definition_url"));
+				v.setStandardDefiUrl(jsonObject.getString("standard_definition_url"));
+				v.setSuperDefiUrl(jsonObject.getString("super_definition_url"));
+				//v.setBroadcastUrl(jsonObject.getString("broadcast_url"));
 				
 				list.add(v);
 				

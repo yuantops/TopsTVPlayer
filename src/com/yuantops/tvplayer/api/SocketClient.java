@@ -2,6 +2,7 @@ package com.yuantops.tvplayer.api;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -83,6 +84,12 @@ public class SocketClient {
 		@Override
 		public void run() {
 			establishConnection();
+			
+			if (!SocketClient.this.isPrepared()) {
+				Log.d(TAG, "establish connection failed！ return...");
+				return;
+			}
+			
 			keepReadingSocket();
 		}
 	}
@@ -98,6 +105,7 @@ public class SocketClient {
 
 			int attempt = 0;
 			do {
+				Log.v(TAG, "try to connect ..." + attempt);
 				this.socketChannel.connect(new InetSocketAddress(ip, port));
 				if (this.socketChannel.isConnected()) {
 					attempt = RETRY_TIME;
@@ -118,6 +126,9 @@ public class SocketClient {
 						"socket establishment failed after reaching attempt limit");
 			}
 
+		} catch (ConnectException e) {
+			Log.d(TAG, "socket establish error");
+			e.printStackTrace();
 		} catch (IOException e) {
 			Log.d(TAG, "socket establish error");
 			e.printStackTrace();
