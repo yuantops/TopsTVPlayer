@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >    
+
+        <!-- 评分最高 -->
+
+        <TextView
+            android:id="@+id/tvtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="35sp" />
+
+        <com.yuantops.tvplayer.ui.GridViewNew
+            android:id="@+id/tvgallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:horizontalSpacing="5dp"
+            android:isScrollContainer="false"
+            android:numColumns="auto_fit"
+            android:padding="5dp"
+            android:verticalSpacing="5dp" />
+
+        <!-- 最新发布 -->
+
+        <TextView
+            android:id="@+id/movietext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="35sp" />
+
+        <com.yuantops.tvplayer.ui.GridViewNew
+            android:id="@+id/filmgallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:horizontalSpacing="5dp"
+            android:isScrollContainer="false"
+            android:numColumns="auto_fit"
+            android:padding="5dp"
+            android:verticalSpacing="5dp" />
+
+        <!-- 观看人数最多 -->
+
+        <TextView
+            android:id="@+id/most_played_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="35sp" />
+
+        <com.yuantops.tvplayer.ui.GridViewNew
+            android:id="@+id/most_played_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:horizontalSpacing="5dp"
+            android:isScrollContainer="false"
+            android:numColumns="auto_fit"
+            android:padding="5dp"
+            android:verticalSpacing="5dp" />
+    </LinearLayout>
+
+</ScrollView>

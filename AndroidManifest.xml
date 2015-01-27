@@ -38,6 +38,9 @@
         <activity android:name="com.yuantops.tvplayer.ui.RegisterActivity" >
         </activity>
         
+        <activity android:name="com.yuantops.tvplayer.ui.VideoDisplayActivity">
+            </activity>
+        
         <service android:name=".AppService">
             </service>
         

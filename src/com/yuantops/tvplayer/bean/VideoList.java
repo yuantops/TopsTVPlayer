@@ -2,6 +2,7 @@ package com.yuantops.tvplayer.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +25,10 @@ public class VideoList implements Serializable{
 	
 	public int getSize() {
 		return list.size();
+	}
+	
+	public Video getVideo(int position) {
+		return list.get(position);
 	}
 	
 	/**
@@ -66,8 +71,15 @@ public class VideoList implements Serializable{
 		} catch (JSONException e) {
 			Log.d(TAG, "+++Failed to create json array since json error.+++");
 			e.printStackTrace();
+		}			
+	}
+	
+	public void print() {
+		Iterator ite = list.iterator();
+		Video item = null;
+		while(ite.hasNext()) {
+			item = (Video) ite.next();
+			Log.v(TAG, "video name: " + item.getVideoName_cn());
 		}
-		
-		
 	}
 }

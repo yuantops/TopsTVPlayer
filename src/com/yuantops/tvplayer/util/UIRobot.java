@@ -48,7 +48,7 @@ public class UIRobot {
 		Intent intent = new Intent(mContext, VideoDisplayActivity.class);
 		intent.putExtra("video", video);
 		mContext.startActivity(intent);
-		AppManager.getInstance().finishActivity();
+		//AppManager.getInstance().finishActivity();
 	}
 	
 	/**

@@ -1,5 +1,7 @@
 package com.yuantops.tvplayer;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.yuantops.tvplayer.api.HttpClientAPI;
 import com.yuantops.tvplayer.util.StringUtils;
 
@@ -43,8 +45,12 @@ public class AppContext extends Application{
 	@Override
 	public void onCreate(){
 		super.onCreate();
+		
+		// Create global configuration and initialize ImageLoader with this config
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+		ImageLoader.getInstance().init(config);
 	}
-	
+		
 	/**
 	 * 检查是否已经接入网络
 	 */

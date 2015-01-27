@@ -13,3 +13,4 @@ Android video player which plays real-time live video stream and on demand video
 ##Projects/Libraries used by this project:
 - [ActionbarSherlock](http://actionbarsherlock.com/)
 - [Vitamio SDK](https://www.vitamio.org/en/)
+- [Universal Image Loader](https://github.com/nostra13/Android-Universal-Image-Loader)   
