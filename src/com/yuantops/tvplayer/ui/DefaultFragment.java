@@ -14,6 +14,8 @@ import com.yuantops.tvplayer.bean.VideoList;
 import com.yuantops.tvplayer.util.UIRobot;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +45,8 @@ public class DefaultFragment extends SherlockFragment implements OnItemClickList
 	private TextView movieTitle;// “最新节目”
 	private TextView mostPlayedTitle;// “最热节目”
 	
+	private Handler myHandler = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
@@ -51,6 +55,18 @@ public class DefaultFragment extends SherlockFragment implements OnItemClickList
 		mostPlayedAdapter = new GridViewAdapterDetail(getActivity(), mostPlayedList);
 		highestRatingAdapter = new GridViewAdapterDetail(getActivity(), highestRatingList);
 		newestAdapter =	new GridViewAdapterDetail(getActivity(), newestList);
+		
+		myHandler = new Handler() {
+			@Override  
+            public void handleMessage(Message msg) {  
+                super.handleMessage(msg);  
+                if(msg.what == 1)  {
+    				mostPlayedAdapter.notifyDataSetChanged();
+    				highestRatingAdapter.notifyDataSetChanged();
+    				newestAdapter.notifyDataSetChanged();
+                }
+           }
+		};
 		
 		Log.v(TAG, "onCreate()");		
 		
@@ -82,9 +98,9 @@ public class DefaultFragment extends SherlockFragment implements OnItemClickList
 				highestRatingList.populateListFromString(webserverResp2);
 				newestList.populateListFromString(webserverResp3);	
 				
-				mostPlayedAdapter.notifyDataSetChanged();
-				highestRatingAdapter.notifyDataSetChanged();
-				newestAdapter.notifyDataSetChanged();
+				Message dataLoadedMsg = new Message();
+				dataLoadedMsg.what = 1;
+				myHandler.sendMessage(dataLoadedMsg);
 				
 				mostPlayedList.print();
 				highestRatingList.print();
@@ -104,7 +120,7 @@ public class DefaultFragment extends SherlockFragment implements OnItemClickList
 		tvTitle.setText("评价最高");
 		tvgallery = (GridViewNew) v.findViewById(R.id.tvgallery);
 		tvgallery.setSelection(1);
-		tvgallery.setNumColumns(LIST_SIZE);
+		//tvgallery.setNumColumns(LIST_SIZE);
 		tvgallery.setAdapter(highestRatingAdapter);
 		tvgallery.setOnItemClickListener(this);
 
@@ -112,7 +128,7 @@ public class DefaultFragment extends SherlockFragment implements OnItemClickList
 		movieTitle.setText("最新上映");
 		filmgallery = (GridViewNew) v.findViewById(R.id.filmgallery);
 		filmgallery.setSelection(1);
-		filmgallery.setNumColumns(LIST_SIZE);
+		//filmgallery.setNumColumns(LIST_SIZE);
 		filmgallery.setAdapter(newestAdapter);
 		filmgallery.setOnItemClickListener(this);
 
@@ -121,7 +137,7 @@ public class DefaultFragment extends SherlockFragment implements OnItemClickList
 		mostplayedgallery = (GridViewNew) v
 				.findViewById(R.id.most_played_gallery);
 		mostplayedgallery.setSelection(1);
-		mostplayedgallery.setNumColumns(LIST_SIZE);
+		//mostplayedgallery.setNumColumns(LIST_SIZE);
 		mostplayedgallery.setAdapter(mostPlayedAdapter);
 		mostplayedgallery.setOnItemClickListener(this);
 				

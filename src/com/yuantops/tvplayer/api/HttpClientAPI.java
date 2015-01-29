@@ -155,6 +155,7 @@ public class HttpClientAPI {
 		loginParams.put("Account", account);
 		loginParams.put("Password", CyptedPwd);
 		
+		//Log.v(TAG, "loginAuth Url: \n"+makeURL(baseURL, loginParams));
 		return httpGet(makeURL(baseURL, loginParams));
 	}
 	

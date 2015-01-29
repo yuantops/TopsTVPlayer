@@ -3,6 +3,7 @@ package com.yuantops.tvplayer.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,31 +24,30 @@ import com.yuantops.tvplayer.bean.Video;
 import com.yuantops.tvplayer.bean.VideoList;
 import com.yuantops.tvplayer.util.UIRobot;
 
-public class MovieFragment extends SherlockFragment implements OnItemClickListener {
-	private static final String TAG = MovieFragment.class.getSimpleName();
+public class BroadcastFragment extends SherlockFragment implements OnItemClickListener {
+	private static final String TAG = BroadcastFragment.class.getSimpleName();
 	
-	private AppContext appContext = null;
+	private AppContext appContext = null;	
+	private VideoList broadcastList = new VideoList();
+	private GridViewAdapterDetail broadcastAdapter = null;
 	
-	private VideoList movieList = new VideoList();
-	private GridViewAdapterDetail movieAdapter = null;
-	
-	private GridViewNew movieGridView;
+	private GridViewNew broadcastGridView;
 	private Handler myHandler = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.v(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
+		Log.v(TAG, "onCreate()");
 		appContext = (AppContext) getActivity().getApplication();
 		
-		movieAdapter = new GridViewAdapterDetail(getActivity(), movieList);	
+		broadcastAdapter = new GridViewAdapterDetail(getActivity(), broadcastList);	
 		
 		myHandler = new Handler() {
 			@Override  
             public void handleMessage(Message msg) {  
                 super.handleMessage(msg);  
                 if(msg.what == 1)  {
-                	movieAdapter.notifyDataSetChanged();
+                	broadcastAdapter.notifyDataSetChanged();
                 }
            }
 		};
@@ -55,22 +55,21 @@ public class MovieFragment extends SherlockFragment implements OnItemClickListen
 		new Thread() {
 			@Override
 			public void run() {
-				Map<String, String> movieListParams = new HashMap<String, String>();
-				movieListParams.put("CATEGORY", "movie");
+				Map<String, String> broadcastListParams = new HashMap<String, String>();
+				broadcastListParams.put("CATEGORY", "broadcast");
 				
 				String servletAppBase = HttpClientAPI.getRootUrl(appContext.getWebServerIP());
 				String servletUrl = servletAppBase + NetworkConstants.HTTP_URL_DELIMITER + NetworkConstants.GET_VIDEO_LIST_SERVLET;
 				String webserverResp1 = HttpClientAPI.httpGet("http://124.16.138.41:8080/FlingHttpServer/RecommendListServlet?action=MOST_PLAYED");
 				
-				//String webserverResp1 = HttpClientAPI.httpGet(HttpClientAPI.makeURL(servletUrl, movieListParams));
-				movieList.populateListFromString(webserverResp1);
-				
+				//String webserverResp1 = HttpClientAPI.httpGet(HttpClientAPI.makeURL(servletUrl, broadcastListParams));
+				broadcastList.populateListFromString(webserverResp1);
 				Message dataLoadedMsg = new Message();
 				dataLoadedMsg.what = 1;
 				myHandler.sendMessage(dataLoadedMsg);
+				//broadcastAdapter.notifyDataSetChanged();
 			}
 		}.start();
-		
 	}
 	
 
@@ -78,14 +77,13 @@ public class MovieFragment extends SherlockFragment implements OnItemClickListen
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		View v = inflater.inflate(R.layout.fragment_movie, container, false);
-		movieGridView = (GridViewNew) v.findViewById(R.id.moviegridView);
-		movieGridView.setAdapter(movieAdapter);
-		movieGridView.setSelection(1);
-		movieGridView.setOnItemClickListener(this);
+		View v = inflater.inflate(R.layout.fragment_broadcast, container, false);		
+		broadcastGridView = (GridViewNew) v.findViewById(R.id.broadcastGridView);
+		broadcastGridView.setAdapter(broadcastAdapter);
+		broadcastGridView.setSelection(1);
+		broadcastGridView.setOnItemClickListener(this);
 		return v;
 	}
-
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {

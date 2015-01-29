@@ -32,7 +32,7 @@ public class HomeActivity extends SherlockFragmentActivity {
 	private String[] tabTags = { "default", "movie", "broadcast" };
 	@SuppressWarnings("rawtypes")	
 	private Class[] fragmentClasses = { DefaultFragment.class,
-			MovieFragment.class, TVFragment.class };
+			MovieFragment.class, BroadcastFragment.class };
 
 	private Intent intent;
 	private Bundle args;
