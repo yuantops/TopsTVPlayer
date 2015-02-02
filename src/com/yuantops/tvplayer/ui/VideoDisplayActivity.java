@@ -6,10 +6,12 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.R;
 import com.yuantops.tvplayer.bean.Video;
+import com.yuantops.tvplayer.util.UIRobot;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,5 +57,14 @@ public class VideoDisplayActivity extends Activity {
 
 		loader.init(ImageLoaderConfiguration.createDefault(this));
 		loader.displayImage(item.getPosterUrl(), dis_videopicture, options);
+		
+		dis_playbutton.setOnClickListener(new Button.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				UIRobot.enterChatroom(VideoDisplayActivity.this);
+			}			
+		});
 	}
 }

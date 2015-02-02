@@ -15,7 +15,13 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.yuantops.tvplayer.bean.DLNABody;
+import com.yuantops.tvplayer.bean.DLNAHead;
+import com.yuantops.tvplayer.bean.DLNAMessage;
+import com.yuantops.tvplayer.bean.NetworkConstants;
+import com.yuantops.tvplayer.bean.RoutingLabel;
 import com.yuantops.tvplayer.util.SocketMsgDispatcher;
+import com.yuantops.tvplayer.*;
 
 import android.content.Context;
 import android.util.Log;
@@ -23,7 +29,7 @@ import android.util.Log;
 /**
  * 与SocketServer建立socket连接的客户端
  * 
- * @author yuan (Email: yuan.tops@gmail.com) *
+ * @author yuan (Email: yuan.tops@gmail.com) 
  * @date Jan 13, 2015
  */
 public class SocketClient {
@@ -63,7 +69,7 @@ public class SocketClient {
 	}
 
 	/**
-	 * 新开线程，完成：1.建立socket连接 2.开启监听循环
+	 * 新开线程，完成：1.建立socket连接 2.向服务器发送注册报文 3.开启监听循环
 	 */
 	public void init() {
 		Log.v(TAG, "init() invoked");
@@ -83,17 +89,17 @@ public class SocketClient {
 	private class InitThread extends Thread {
 		@Override
 		public void run() {
-			establishConnection();
-			
+			establishConnection();			
 			if (!SocketClient.this.isPrepared()) {
 				Log.d(TAG, "establish connection failed！ return...");
 				return;
-			}
-			
-			keepReadingSocket();
+			} else {
+				sendRegisterMessage();			
+				keepReadingSocket();
+			}			
 		}
 	}
-
+		
 	/**
 	 * 新建selector,socketChannel；向selector注册socketChannel的可读监听
 	 */
@@ -137,6 +143,24 @@ public class SocketClient {
 			e.printStackTrace();
 		}
 		Log.v(TAG, "establishConnection() end");
+	}
+	
+	/**
+	 * 发送注册报文
+	 */
+	private void sendRegisterMessage() {
+		RoutingLabel orginLabel = new RoutingLabel("Agent", "0",
+				((AppContext)mContext.getApplicationContext()).getClientIP_hex(), ((AppContext)mContext.getApplicationContext()).getClientIP(), String.valueOf(NetworkConstants.LOCAL_DEFAULT_CONN_PORT), "android_client");
+		RoutingLabel desitLabel = new RoutingLabel("Proxy", "0",
+				"00000000", ((AppContext)mContext.getApplicationContext()).getSocketServerIP(), String.valueOf(NetworkConstants.DLNA_PROXY_PORT), "");
+		
+		DLNABody nofityBody = new DLNABody();
+		DLNAHead nofityHead = null;
+		nofityHead = new DLNAHead("NOTIFY", orginLabel, desitLabel,
+				orginLabel, desitLabel, "0");		
+		DLNAMessage nofityMessage = new DLNAMessage(nofityHead,
+				nofityBody);
+		sendMessage(nofityMessage.printDLNAMessage());	
 	}
 
 	/**
@@ -191,7 +215,7 @@ public class SocketClient {
 						if (readBytes < 0) {
 							((SocketChannel) key.channel()).close();
 							Log.d(TAG, "End of Stream caught.");
-							return;
+							//return;
 						} else if (readBytes == 0) {
 							break;
 						} else {
@@ -205,15 +229,13 @@ public class SocketClient {
 									e.printStackTrace();
 								}
 							}
-						}
-						
+						}						
 						
 						if (charBuffer != null) {
 							Log.v(TAG, "decoded string from socket>>>>>>\n"
 									+ charBuffer.toString());
 							SocketMsgDispatcher.processMsg(mContext,
-									charBuffer.toString());
-							
+									charBuffer.toString());							
 						}
 					} catch (IOException e) {
 						System.out
@@ -221,7 +243,6 @@ public class SocketClient {
 						e.printStackTrace();
 					}
 				}
-
 				keyIterator.remove();
 			}
 		}

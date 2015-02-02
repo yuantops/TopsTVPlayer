@@ -48,7 +48,8 @@ public class SocketMsgDispatcher {
 	 */
 	private static DLNABody retrieveMsgBody(String message) {		
 		String[] lines = message.split("\\r\\n\\r\\n");
-		if (StringUtils.isEmpty(lines[1])) {
+	//	if (StringUtils.isEmpty(lines[1])) {
+		if (lines.length < 2) {
 			Log.d(TAG, "Exception caught since empty dlna body retrieved");
 			return null;
 		}

@@ -2,6 +2,7 @@ package com.yuantops.tvplayer.util;
 
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
+import com.yuantops.tvplayer.ui.ChatActivity;
 import com.yuantops.tvplayer.ui.HomeActivity;
 import com.yuantops.tvplayer.ui.RegisterActivity;
 import com.yuantops.tvplayer.ui.VideoDisplayActivity;
@@ -49,6 +50,11 @@ public class UIRobot {
 		intent.putExtra("video", video);
 		mContext.startActivity(intent);
 		//AppManager.getInstance().finishActivity();
+	}
+	
+	public static void enterChatroom(Context mContext) {
+		Intent intent = new Intent(mContext, ChatActivity.class);
+		mContext.startActivity(intent);
 	}
 	
 	/**

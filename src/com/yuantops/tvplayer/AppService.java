@@ -43,7 +43,7 @@ public class AppService extends Service {
 		socketClient = new SocketClient(appContext.getSocketServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
 		socketClient.init();
 		
-		for(int count = 0; count < TRY_TIME_LIMIT; count++) {
+		/*for(int count = 0; count < TRY_TIME_LIMIT; count++) {
 			if (socketClient.isPrepared()) {
 				register(socketClient);
 				break;
@@ -54,15 +54,14 @@ public class AppService extends Service {
 					e.printStackTrace();
 				}
 			}
-		}
-		Log.d(TAG, "cannot connect socket server...");
+		}*/
 	}
 	
 	/**
 	 * 向SockerServer发送注册(NOTIFY)信息
 	 * @param socketClient2
 	 */
-	private void register(SocketClient socketClient2) {
+	/*private void register(SocketClient socketClient2) {
 		RoutingLabel orginLabel = new RoutingLabel("Agent", "0",
 				appContext.getClientIP_hex(), appContext.getClientIP(), String.valueOf(NetworkConstants.LOCAL_DEFAULT_CONN_PORT), "android_client");
 		RoutingLabel desitLabel = new RoutingLabel("Proxy", "0",
@@ -75,7 +74,7 @@ public class AppService extends Service {
 		DLNAMessage nofityMessage = new DLNAMessage(nofityHead,
 				nofityBody);
 		socketClient2.sendMessage(nofityMessage.printDLNAMessage());		
-	}
+	}*/
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -104,7 +103,7 @@ public class AppService extends Service {
 		socketClient.destroy();
 	}
 	
-	class MyBinder extends Binder {
+	public class MyBinder extends Binder {
 		/**
 		 * 发送字符串信息
 		 * @param msg
@@ -132,7 +131,6 @@ public class AppService extends Service {
 					"00000000", destIP, "1901", "");
 			
 			DLNAHead head = null;
-
 			try {
 				head = new DLNAHead("FORWARD", label1, label2, label3,
 						label4, String.valueOf(msgBody.printDLNABody()
