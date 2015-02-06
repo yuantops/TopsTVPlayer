@@ -23,6 +23,7 @@ import com.yuantops.tvplayer.bean.RoutingLabel;
 import com.yuantops.tvplayer.util.SocketMsgDispatcher;
 import com.yuantops.tvplayer.*;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -35,19 +36,20 @@ import android.util.Log;
 public class SocketClient {
 	private static final String TAG = SocketClient.class.getSimpleName();
 
-	private final static int SLEEP_TIME_SOCKET = 2000;
-	private final static int RETRY_TIME = 3;
+	private final static int SLEEP_TIME_SOCKET      = 2000;
+	private final static int RETRY_TIME             = 3;
 	private final static int READ_WRITE_BUFFER_SIZE = 512;
 
 	private String ip;
 	private int port;
-
-	private Context mContext;
-	private boolean runFlag;// 监听开关
+		
+	private Context       mContext;
+	private boolean       runFlag;// 监听开关
 	private SocketChannel socketChannel;
-	private Selector selector;
-	private ByteBuffer readBuffer;
-	private ByteBuffer writeBuffer;
+	private Selector      selector;
+	private ByteBuffer    readBuffer;//Buffer for storing each tempReadBuffer 
+	private ByteBuffer    tempReadBuffer;//Buffer for each read()
+	private ByteBuffer    writeBuffer;
 
 	/*
 	 * public SocketClient (String ip, int port, SocketMsgDispatcher mHandler) {
@@ -64,8 +66,9 @@ public class SocketClient {
 		this.port = port;
 
 		this.runFlag = false;
-		this.readBuffer = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
-		this.writeBuffer = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
+		this.readBuffer      = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
+		this.tempReadBuffer  = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
+		this.writeBuffer     = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
 	}
 
 	/**
@@ -166,14 +169,15 @@ public class SocketClient {
 	/**
 	 * 进入循环，监听socket，读取数据
 	 */
+	@SuppressLint("NewApi")
 	private void keepReadingSocket() {
 		Log.v(TAG, "keepReadingSocket() invoked");
 
+		Set<SelectionKey> selectedKeys = null;
 		while (runFlag) {
-
 			Log.v(TAG, "start one select loop......");
 
-			Set<SelectionKey> selectedKeys = null;
+			selectedKeys = null;
 			try {
 				Log.v(TAG, "select starts blocking...");
 				selector.select();
@@ -195,12 +199,54 @@ public class SocketClient {
 			}
 
 			Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-
 			while (keyIterator.hasNext()) {
 				Log.v(TAG, "selectedKeys size: " + selectedKeys.size());
 				SelectionKey key = keyIterator.next();
 				if (key.isReadable()) {
-					Log.v(TAG, "socket channel readable selected");
+					
+					int readBytesNum = 0;					
+					readBuffer.clear();
+					tempReadBuffer.clear();
+					
+					try {
+						while ((readBytesNum = ((SocketChannel) key.channel()).read(tempReadBuffer)) > 0) {
+							if (readBuffer.remaining() < readBytesNum) {
+								Log.v(TAG, "Doubling readBuffer size");
+								ByteBuffer biggerBuffer = ByteBuffer.allocate(readBuffer.capacity() * 2);
+								readBuffer.flip();
+								biggerBuffer.put(readBuffer);
+								readBuffer = biggerBuffer;
+							}
+							tempReadBuffer.flip();
+							readBuffer.put(tempReadBuffer);
+							tempReadBuffer.clear();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+					if (readBytesNum == -1) {
+						Log.d(TAG, "End of socket reached. Returned...");
+						return;
+					} else if (readBytesNum == 0) {
+						readBuffer.flip();
+						String bufContent = null;
+						try {
+							CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+							CharBuffer     charBuf = decoder.decode(readBuffer);
+							bufContent = charBuf.toString();
+						} catch (CharacterCodingException e) {
+							Log.d(TAG, "Exception caught when decoding from bytes");
+							e.printStackTrace();
+						}
+						Log.v(TAG, "dlna string: \n" + bufContent);
+						SocketMsgDispatcher.processMsg(mContext, bufContent);		
+					}	
+				}
+			}
+		}
+	}
+					/*Log.v(TAG, "socket channel readable selected");
 					try {						
 						int readBytes;	
 						Charset charset = Charset.forName("UTF-8");
@@ -243,12 +289,11 @@ public class SocketClient {
 						e.printStackTrace();
 					}
 				}
-				keyIterator.remove();
 			}
 		}
 		Log.v(TAG, "keepReadingSocket() end");
 	}
-
+*/
 	/**
 	 * 新开线程，向socket写字符串
 	 * 
