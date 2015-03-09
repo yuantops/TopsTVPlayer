@@ -95,8 +95,8 @@ public class ChatActivity extends Activity {
 					DLNABody msgToSend = new DLNABody();
 					msgToSend.addRecord("ACTION", "CHAT");
 					msgToSend.addRecord("random", inputString);
-					mBinder.sendMessage("192.168.1.111", msgToSend);
-					mBinder.sendMessage("192.168.1.131", msgToSend);
+					mBinder.sendMessage("192.168.1.100", msgToSend);
+					mBinder.sendMessage("192.168.1.159", msgToSend);
 					
 					Message uiUpdateNotice = new Message();
 					uiUpdateNotice.what = 0;

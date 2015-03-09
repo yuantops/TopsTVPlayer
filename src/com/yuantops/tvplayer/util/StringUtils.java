@@ -5,10 +5,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -276,5 +279,36 @@ public class StringUtils {
 			}
 		}
 		return res.toString();
+	}
+	
+	/**
+	 * Convert time to a string
+	 * 
+	 * @param millis
+	 *            e.g.time/length from file
+	 * @return formated string (hh:)mm:ss
+	 */
+	public static String millisToString(long millis) {
+		boolean negative = millis < 0;
+		millis = java.lang.Math.abs(millis);
+
+		millis /= 1000;
+		int sec = (int) (millis % 60);
+		millis /= 60;
+		int min = (int) (millis % 60);
+		millis /= 60;
+		int hours = (int) millis;
+
+		String time;
+		DecimalFormat format = (DecimalFormat) NumberFormat
+				.getInstance(Locale.US);
+		format.applyPattern("00");
+		if (millis > 0) {
+			time = (negative ? "-" : "") + hours + ":" + format.format(min)
+					+ ":" + format.format(sec);
+		} else {
+			time = (negative ? "-" : "") + min + ":" + format.format(sec);
+		}
+		return time;
 	}
 }
