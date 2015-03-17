@@ -39,7 +39,7 @@ public class AppService extends Service {
 		myBinder = new MyBinder();
 		appContext = (AppContext) this.getApplication();
 		
-		//初始化socketClient，int()方法会新开后台线程监听socket连接
+		//初始化socketClient，int()新开后台线程监听socket连接
 		socketClient = new SocketClient(appContext.getSocketServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
 		socketClient.init();
 		

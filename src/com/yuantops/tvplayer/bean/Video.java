@@ -14,14 +14,14 @@ public class Video implements Serializable{
 	private String videoName_en;//英文名
 	private String videoName_cn;//中文名
 	private String introduction;//剧情介绍
-	private String releaseDate;//上映日期
-	private String runtime;//时长
-	private String category;//类别:喜剧，爱情，动作……
-	private String type;//直播/点播
-	private int playedTimes;//播放次数
+	private String releaseDate; //上映日期
+	private String runtime;     //时长
+	private String category;    //类别:喜剧，爱情，动作……
+	private String type;        //直播/点播
+	private int    playedTimes; //播放次数
 	
-	private String posterUrl;//海报图片链接
-	private String highDefiUrl;//高清链接
+	private String posterUrl;   //海报图片链接
+	private String highDefiUrl; //高清链接
 	private String standardDefiUrl;//标清链接
 	private String superDefiUrl;//超清链接
 	private String broadcastUrl;//直播链接
