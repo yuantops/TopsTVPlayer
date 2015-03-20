@@ -246,54 +246,7 @@ public class SocketClient {
 			}
 		}
 	}
-					/*Log.v(TAG, "socket channel readable selected");
-					try {						
-						int readBytes;	
-						Charset charset = Charset.forName("UTF-8");
-						CharsetDecoder decoder = charset.newDecoder();
-						CharBuffer charBuffer = null ;
-
-						readBytes = 0;
-						readBuffer.clear();
-						readBytes = ((SocketChannel) key.channel())
-								.read(readBuffer);
-
-						if (readBytes < 0) {
-							((SocketChannel) key.channel()).close();
-							Log.d(TAG, "End of Stream caught.");
-							//return;
-						} else if (readBytes == 0) {
-							break;
-						} else {
-							readBuffer.flip();
-							if (readBuffer.remaining() != 0) {
-								try {
-									charBuffer = decoder.decode(readBuffer);
-								} catch (CharacterCodingException e) {
-									Log.d(TAG,
-											"Exception caught when decoding from bytes");
-									e.printStackTrace();
-								}
-							}
-						}						
-						
-						if (charBuffer != null) {
-							Log.v(TAG, "decoded string from socket>>>>>>\n"
-									+ charBuffer.toString());
-							SocketMsgDispatcher.processMsg(mContext,
-									charBuffer.toString());							
-						}
-					} catch (IOException e) {
-						System.out
-								.println("Exception caught when reading socket");
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		Log.v(TAG, "keepReadingSocket() end");
-	}
-*/
+					
 	/**
 	 * 新开线程，向socket写字符串
 	 * 

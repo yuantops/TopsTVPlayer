@@ -67,11 +67,12 @@ public class UIRobot {
 			return;
 		}
 		Intent intent = null;
-		if(video.getType().equals(Video.LIVE_BROADCAST_TYPE)){
+		intent = new Intent(mContext, VideoPlayActivity.class);		
+		/*if(video.getType().equals(Video.LIVE_BROADCAST_TYPE)){
 			intent = new Intent(mContext, VideoPlayActivity_Vitamio.class);
 		}else if(video.getType().equals(Video.VIDEO_ON_DEMAND_TYPE)){
 			intent = new Intent(mContext, VideoPlayActivity.class);
-		}
+		}*/
 		intent.putExtra("video", video);
 		mContext.startActivity(intent);
 		

@@ -11,6 +11,7 @@ import com.yuantops.tvplayer.util.UIRobot;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,7 +38,7 @@ public class VideoDisplayActivity extends Activity {
 		AppManager.getInstance().addActivity(this);
 		
 		Intent intent = this.getIntent();
-		Video item = (Video) intent.getSerializableExtra("video");
+		final Video item = (Video) intent.getSerializableExtra("video");
 				
 		dis_videopicture = (ImageView) findViewById(R.id.dis_videopicture);
 		dis_playbutton = (Button) findViewById(R.id.dis_playbutton);
@@ -63,6 +64,7 @@ public class VideoDisplayActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+				Log.v(TAG + " >video info", item.toString());
 				UIRobot.enterChatroom(VideoDisplayActivity.this);
 			}			
 		});

@@ -41,7 +41,7 @@ public class VideoPlayActivity extends Activity{
 	private SurfaceView surView;                    //View for displaying video content; 显示视频内容的组件
 	private SeekBar     seekBar;                    //SeekBar
 	private TextView    curTimeView, totTimeView;   //current moment, total time TextView under SeekBar	
-	private ImageButton playImgBtn;            //	
+	private ImageButton playImgBtn;                 //	
 	private ImageView   QRCodeImgV;                 //	
 	private VideoPlayer viPlayer;                   //
 	
@@ -65,9 +65,9 @@ public class VideoPlayActivity extends Activity{
 		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);// 设置横屏播放
 		this.setContentView(R.layout.activity_videoplay);
 		
-		//Bind to ServiceDemo
+		//Bind to Service
 		Intent bindIntent = new Intent();
-		bindIntent.setAction(action); //Action is defined in AndroidManifest.xml
+		bindIntent.setAction("com.yuantops.TopsTVPlayer.SERVICE"); //Action is defined in AndroidManifest.xml
 		getApplicationContext().bindService(bindIntent, conn, Service.BIND_AUTO_CREATE);
 		
 		initViewComponents();
@@ -118,6 +118,13 @@ public class VideoPlayActivity extends Activity{
 		dm = getResources().getDisplayMetrics();
 		viHeight = dm.heightPixels;
 		viWidth  = dm.widthPixels;
+	}
+	
+	/**
+	 * Add listeners to views
+	 */
+	private void addViewListeners() {
+		//TODO
 	}
 	
 	/**

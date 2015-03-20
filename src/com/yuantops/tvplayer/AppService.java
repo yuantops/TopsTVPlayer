@@ -41,40 +41,8 @@ public class AppService extends Service {
 		
 		//初始化socketClient，int()新开后台线程监听socket连接
 		socketClient = new SocketClient(appContext.getSocketServerIP(), NetworkConstants.DLNA_PROXY_PORT, this);
-		socketClient.init();
-		
-		/*for(int count = 0; count < TRY_TIME_LIMIT; count++) {
-			if (socketClient.isPrepared()) {
-				register(socketClient);
-				break;
-			} else {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}*/
-	}
-	
-	/**
-	 * 向SockerServer发送注册(NOTIFY)信息
-	 * @param socketClient2
-	 */
-	/*private void register(SocketClient socketClient2) {
-		RoutingLabel orginLabel = new RoutingLabel("Agent", "0",
-				appContext.getClientIP_hex(), appContext.getClientIP(), String.valueOf(NetworkConstants.LOCAL_DEFAULT_CONN_PORT), "android_client");
-		RoutingLabel desitLabel = new RoutingLabel("Proxy", "0",
-				"00000000", appContext.getSocketServerIP(), String.valueOf(NetworkConstants.DLNA_PROXY_PORT), "");
-		
-		DLNABody nofityBody = new DLNABody();
-		DLNAHead nofityHead = null;
-		nofityHead = new DLNAHead("NOTIFY", orginLabel, desitLabel,
-				orginLabel, desitLabel, "0");		
-		DLNAMessage nofityMessage = new DLNAMessage(nofityHead,
-				nofityBody);
-		socketClient2.sendMessage(nofityMessage.printDLNAMessage());		
-	}*/
+		socketClient.init();		
+	}	
 
 	@Override
 	public IBinder onBind(Intent arg0) {

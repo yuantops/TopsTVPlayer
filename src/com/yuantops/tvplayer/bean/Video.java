@@ -150,4 +150,9 @@ public class Video implements Serializable{
 		this.broadcastUrl = broadcastUrl;
 	}	
 
+	@Override
+	public String toString() {
+		return String.format("%s standard url: %s%n, high url: %s%n, super url: %s%s", this.getVideoName_cn(), this.getStandardDefiUrl(), this.getHighDefiUrl(), this.getSuperDefiUrl());
+	}
+	
 }
