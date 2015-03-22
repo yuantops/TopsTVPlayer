@@ -24,11 +24,11 @@ public class VideoDisplayActivity extends Activity {
 	Button dis_playbutton;
 	TextView dis_videoname , dis_playtimes ,dis_releasedate, dis_duringtime , dis_category , dis_introduction;
 
-	private DisplayImageOptions options = new DisplayImageOptions.Builder()
+	/*private DisplayImageOptions options = new DisplayImageOptions.Builder()
 			.showImageOnLoading(R.drawable.vlc)
 			.showImageForEmptyUri(R.drawable.vlc)
 			.showImageOnFail(R.drawable.vlc).cacheInMemory(true)
-			.cacheOnDisk(true).build();
+			.cacheOnDisk(true).build();*/
 	private ImageLoader loader = ImageLoader.getInstance();
 
 	@Override
@@ -57,15 +57,15 @@ public class VideoDisplayActivity extends Activity {
 		dis_introduction.setText(item.getIntroduction());		
 
 		loader.init(ImageLoaderConfiguration.createDefault(this));
-		loader.displayImage(item.getPosterUrl(), dis_videopicture, options);
+		loader.displayImage(item.getPosterUrl(), dis_videopicture);
 		
 		dis_playbutton.setOnClickListener(new Button.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				Log.v(TAG + " >video info", item.toString());
-				UIRobot.enterChatroom(VideoDisplayActivity.this);
+				//UIRobot.enterChatroom(VideoDisplayActivity.this);
+				UIRobot.openVideoPlayer(VideoDisplayActivity.this, item);
 			}			
 		});
 	}

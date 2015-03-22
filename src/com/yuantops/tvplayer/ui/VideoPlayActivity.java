@@ -12,16 +12,21 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 /**
@@ -41,7 +46,7 @@ public class VideoPlayActivity extends Activity{
 	private SurfaceView surView;                    //View for displaying video content; 显示视频内容的组件
 	private SeekBar     seekBar;                    //SeekBar
 	private TextView    curTimeView, totTimeView;   //current moment, total time TextView under SeekBar	
-	private ImageButton playImgBtn;                 //	
+	private ImageButton playImgBtn;                 //play/pause button	
 	private ImageView   QRCodeImgV;                 //	
 	private VideoPlayer viPlayer;                   //
 	
@@ -56,8 +61,10 @@ public class VideoPlayActivity extends Activity{
 		}		
 	};
 	
-	public void onCreated(Bundle savedInstanceState) {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.v(TAG, "onCreate()...");
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);                   // 不显示标题
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, // 全屏
@@ -124,8 +131,68 @@ public class VideoPlayActivity extends Activity{
 	 * Add listeners to views
 	 */
 	private void addViewListeners() {
-		//TODO
+		seekBar.setOnSeekBarChangeListener(seekBarListener);
+		playImgBtn.setOnClickListener(clickListener);
+		playImgBtn.setOnFocusChangeListener(viewFocusChangeListener);
 	}
+	
+	/**
+	 * When moving seeking bar, update progress.
+	 */
+	private OnSeekBarChangeListener seekBarListener = new OnSeekBarChangeListener() {
+		int progress;
+		@Override
+		public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+			progress = (int) (progress * viPlayer.getDuration()
+					/ seekBar.getMax());
+		}
+		@Override
+		public void onStartTrackingTouch(SeekBar arg0) {
+		}
+		@Override
+		public void onStopTrackingTouch(SeekBar arg0) {
+			viPlayer.seekTo(progress);
+		}		
+	};
+	
+	/**
+	 * when clicking on pause/play button
+	 */
+	private OnClickListener clickListener  = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			switch (v.getId()) {
+			//TODO
+			case R.id.ib_play_pause:
+				if (!viPlayer.isPlaying()) {
+					viPlayer.play();
+					playImgBtn.setImageResource(R.drawable.pause);					
+				} else {
+					viPlayer.pause();
+					playImgBtn.setImageResource(R.drawable.play);
+				}
+				break;
+			default:
+				break;
+			}
+		}		
+	};
+	
+	/**
+	 * when focus of view  changes;
+	 */
+	private OnFocusChangeListener viewFocusChangeListener = new OnFocusChangeListener() {
+		@Override
+		public void onFocusChange(View v, boolean hasFocus) {
+			if (hasFocus) {
+				v.setBackgroundColor(Color.GRAY);
+				Log.v(TAG + " >focus changed", "has focus");
+			} else {
+				v.setBackgroundColor(Color.TRANSPARENT);
+				Log.v(TAG + " >focus changed", "lose focus");
+			}
+		}
+	};
 	
 	/**
 	 * Get screen size and return corresponding size type

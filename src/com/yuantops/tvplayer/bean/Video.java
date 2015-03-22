@@ -152,7 +152,7 @@ public class Video implements Serializable{
 
 	@Override
 	public String toString() {
-		return String.format("%s standard url: %s%n, high url: %s%n, super url: %s%s", this.getVideoName_cn(), this.getStandardDefiUrl(), this.getHighDefiUrl(), this.getSuperDefiUrl());
+		return String.format("%s standard url: %s%nhigh url: %s%nsuper url: %s%n", this.getVideoName_cn(), this.getStandardDefiUrl(), this.getHighDefiUrl(), this.getSuperDefiUrl());
 	}
 	
 }

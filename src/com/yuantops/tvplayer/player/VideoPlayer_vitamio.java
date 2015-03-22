@@ -36,6 +36,7 @@ public class VideoPlayer_vitamio implements VideoPlayer,
 
 	public VideoPlayer_vitamio(SurfaceView surfaceView, String videoUrl,
 			Context context) {
+		Log.v(TAG, "initialize");
 		this.surfaceHolder = surfaceView.getHolder();
 		this.videoUrl = videoUrl;
 		this.mContext = context;
@@ -153,5 +154,12 @@ public class VideoPlayer_vitamio implements VideoPlayer,
 		Log.v(TAG, "set returned postion 50");
 		return 50;
 	}
+	
+	public int getDuration() {
+		return 0;
+	}
 
+	public void seekTo(int progress) {
+		return;
+	}
 }

@@ -137,7 +137,7 @@ public class VideoPlayer_native implements VideoPlayer{
 			if (vpHeight != 0 && vpWidth != 0) {
 				mp.start();// 播放视频
 			}
-			Log.e("mediaPlayer", "onPrepared");
+			Log.v("mediaPlayer", "onPrepared");
 		}
 	};
 	
@@ -153,6 +153,8 @@ public class VideoPlayer_native implements VideoPlayer{
 	public VideoPlayer_native(SurfaceView surView, SeekBar seekBar, String vUrl, 
 			TextView vpCurrentTime, TextView vpTotalTime, 
 			int vpBeginTime, Context context) {
+
+		Log.v(TAG, "initialize");
 		this.mContext = context;
 		this.seekBar  = seekBar;
 		this.vUrl     = vUrl;
@@ -205,5 +207,12 @@ public class VideoPlayer_native implements VideoPlayer{
 			return (int) mePlayer.getCurrentPosition();
 		}
 	}
+	
+	public int getDuration() {
+		return mePlayer.getDuration();
+	}
 
+	public void seekTo(int progress) {
+		mePlayer.seekTo(progress);
+	}
 }

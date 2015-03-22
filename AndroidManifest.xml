@@ -40,6 +40,8 @@
         </activity>
         <activity android:name="com.yuantops.tvplayer.ui.VideoDisplayActivity" >
         </activity>
+        <activity android:name="com.yuantops.tvplayer.ui.VideoPlayActivity" >
+        </activity>
 
         <service android:name=".AppService" >
             <intent-filter>

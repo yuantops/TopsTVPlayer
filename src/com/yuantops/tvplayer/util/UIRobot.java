@@ -12,6 +12,7 @@ import com.yuantops.tvplayer.ui.VideoPlayActivity_Vitamio;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -66,21 +67,21 @@ public class UIRobot {
 		if(video == null){
 			return;
 		}
-		Intent intent = null;
-		intent = new Intent(mContext, VideoPlayActivity.class);		
+		Intent intent = new Intent(mContext, VideoPlayActivity.class);		
 		/*if(video.getType().equals(Video.LIVE_BROADCAST_TYPE)){
 			intent = new Intent(mContext, VideoPlayActivity_Vitamio.class);
 		}else if(video.getType().equals(Video.VIDEO_ON_DEMAND_TYPE)){
 			intent = new Intent(mContext, VideoPlayActivity.class);
 		}*/
 		intent.putExtra("video", video);
+		Log.v(TAG, "openVideoPlayer()...");
 		mContext.startActivity(intent);
 		
 		//如果当前的置顶Activity为播放器，那么销毁它
-		Activity currentActivity = AppManager.getInstance().currentActivity();
+		/*Activity currentActivity = AppManager.getInstance().currentActivity();
 		if(currentActivity.getClass().getSimpleName().equals("VideoPlayActivity_Vitamio") || currentActivity.getClass().getSimpleName().equals("VideoPlayActivity")){
 			AppManager.getInstance().finishActivity();
-		}
+		}*/
 	}
 	
 	/**

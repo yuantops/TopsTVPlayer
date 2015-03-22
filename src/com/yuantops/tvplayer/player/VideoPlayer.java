@@ -10,4 +10,6 @@ public interface VideoPlayer {
 	void pause();
 	void stop();
 	boolean isPlaying(); 
+	int getDuration();
+	void seekTo(int progress);
 }

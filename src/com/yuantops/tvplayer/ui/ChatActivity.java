@@ -84,7 +84,8 @@ public class ChatActivity extends Activity {
 		bindService(serviceIntent, conn, Service.BIND_AUTO_CREATE);
 
 		chatBroadcastIntentFilter.addAction(SocketMsgDispatcher.CHAT_BROADCAST);
-		registerReceiver(inboundChatRecvr, chatBroadcastIntentFilter);
+		//register and unregister broadcast filter in onStart() and onStop();
+		//registerReceiver(inboundChatRecvr, chatBroadcastIntentFilter);
 		
 		msg_send.setOnClickListener(new Button.OnClickListener() {
 
@@ -105,6 +106,16 @@ public class ChatActivity extends Activity {
 				}
 			}			
 		});
+	}
+	
+	@Override
+	public void onStart() {
+		registerReceiver(inboundChatRecvr, chatBroadcastIntentFilter);
+	}
+	
+	@Override
+	public void onStop() {
+		unregisterReceiver(inboundChatRecvr);
 	}
 	
 	public void onDestroy() {
