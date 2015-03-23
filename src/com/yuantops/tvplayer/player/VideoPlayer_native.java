@@ -214,5 +214,6 @@ public class VideoPlayer_native implements VideoPlayer{
 
 	public void seekTo(int progress) {
 		mePlayer.seekTo(progress);
+		//Log.v(TAG, "seekTo() " + progress);
 	}
 }

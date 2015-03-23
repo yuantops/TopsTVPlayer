@@ -27,12 +27,12 @@ public class VideoPlayer_vitamio implements VideoPlayer,
 	private static final String TAG = VideoPlayer.class.getSimpleName();
 	private int mVideoWidth;
 	private int mVideoHeight;
-	private Context mContext;// VideoPlayerVitamio所处的上下文
-	private SurfaceHolder surfaceHolder;//
-	private MediaPlayer mediaPlayer;// 组件：MediaPlayer
-	private String videoUrl;// 视频流URL
-	private boolean mIsVideoSizeKnown = false;
-	private boolean mIsVideoReadyToBePlayed = false;
+	private Context       mContext;      // VideoPlayerVitamio所处的上下文
+	private SurfaceHolder surfaceHolder; //
+	private MediaPlayer   mediaPlayer;   // 组件：MediaPlayer
+	private String        videoUrl;      // 视频流URL
+	private boolean       mIsVideoSizeKnown = false;
+	private boolean       mIsVideoReadyToBePlayed = false;
 
 	public VideoPlayer_vitamio(SurfaceView surfaceView, String videoUrl,
 			Context context) {
@@ -67,7 +67,7 @@ public class VideoPlayer_vitamio implements VideoPlayer,
 			mediaPlayer.setOnVideoSizeChangedListener(this);
 			// this.mContext.getSystemService(arg0)setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		} catch (Exception e) {
-			Log.e(TAG, "error: " + e.getMessage(), e);
+			//Log.e(TAG, "error: " + e.getMessage(), e);
 			e.printStackTrace();
 		}
 	}

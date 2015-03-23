@@ -121,6 +121,7 @@ public class VideoPlayActivity extends Activity{
 		playImgBtn.requestFocus();
 		playImgBtn.setImageResource(R.drawable.pause);
 		
+		//Get screen size and thus deciding device resolution 
 		DisplayMetrics dm = new DisplayMetrics();
 		dm = getResources().getDisplayMetrics();
 		viHeight = dm.heightPixels;
@@ -142,8 +143,8 @@ public class VideoPlayActivity extends Activity{
 	private OnSeekBarChangeListener seekBarListener = new OnSeekBarChangeListener() {
 		int progress;
 		@Override
-		public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-			progress = (int) (progress * viPlayer.getDuration()
+		public void onProgressChanged(SeekBar seekBar, int progress0, boolean fromUser) {
+			progress = (int) (progress0 * viPlayer.getDuration()
 					/ seekBar.getMax());
 		}
 		@Override
@@ -152,17 +153,17 @@ public class VideoPlayActivity extends Activity{
 		@Override
 		public void onStopTrackingTouch(SeekBar arg0) {
 			viPlayer.seekTo(progress);
+			//Log.v(TAG, "onStopTrackingTouch() called");
 		}		
 	};
 	
 	/**
-	 * when clicking on pause/play button
+	 * when clicking pause/play button, flip button's background image
 	 */
 	private OnClickListener clickListener  = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			switch (v.getId()) {
-			//TODO
 			case R.id.ib_play_pause:
 				if (!viPlayer.isPlaying()) {
 					viPlayer.play();
@@ -195,7 +196,7 @@ public class VideoPlayActivity extends Activity{
 	};
 	
 	/**
-	 * Get screen size and return corresponding size type
+	 * Return device resolution type according to screen size
 	 * @return
 	 */
 	private byte getDevResolution() {
