@@ -1,5 +1,7 @@
 package com.yuantops.tvplayer.ui;
 
+import io.vov.vitamio.LibsChecker;
+
 import com.yuantops.tvplayer.R;
 import com.yuantops.tvplayer.bean.Video;
 import com.yuantops.tvplayer.player.VideoPlayer;
@@ -87,6 +89,10 @@ public class VideoPlayActivity extends Activity{
 		String viUrl;
 		if (video.getType().equals(Video.LIVE_BROADCAST_TYPE)) {
 			viUrl    = video.getBroadcastUrl();
+			
+			if (!LibsChecker.checkVitamioLibs(this))
+				return;
+			
 			viPlayer = new VideoPlayer_vitamio(surView, viUrl, this);
 		} else {
 			switch (getDevResolution()) {
