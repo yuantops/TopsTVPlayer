@@ -14,6 +14,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.yuantops.tvplayer.bean.DLNABody;
 import com.yuantops.tvplayer.bean.DLNAHead;
@@ -51,6 +53,8 @@ public class SocketClient {
 	private ByteBuffer    tempReadBuffer;//Buffer for each read()
 	private ByteBuffer    writeBuffer;
 
+	private ExecutorService transmitterPool;//Thread pool for sending message
+	
 	/*
 	 * public SocketClient (String ip, int port, SocketMsgDispatcher mHandler) {
 	 * this(ip, port); this.mHandler = mHandler; }
@@ -69,6 +73,7 @@ public class SocketClient {
 		this.readBuffer      = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
 		this.tempReadBuffer  = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
 		this.writeBuffer     = ByteBuffer.allocate(READ_WRITE_BUFFER_SIZE);
+		this.transmitterPool = Executors.newSingleThreadExecutor();
 	}
 
 	/**
@@ -252,9 +257,14 @@ public class SocketClient {
 	 * 
 	 * @param message
 	 */
-	public void sendMessage(String str) {
+	public void sendMessage(final String str) {
 		Log.v(TAG, "message send BY socketClient:\n" + str);
-		new sendMessageThread(str).start();
+		this.transmitterPool.submit(new Runnable(){
+			@Override
+			public void run() {
+				writeSocket(str);
+			}});
+		//new sendMessageThread(str).start();
 	}
 
 	/**
