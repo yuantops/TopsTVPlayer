@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.yuantops.tvplayer"
-        minSdkVersion 8
+        minSdkVersion 14
         targetSdkVersion 19
     }
 
@@ -22,4 +22,8 @@ dependencies {
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile 'com.android.support:support-v4:19.0.+'
+    compile 'me.neavo:vitamio:4.2.2'
+    compile 'com.google.zxing:core:2.0'
+
+    testCompile 'junit:junit:4.12'
 }
