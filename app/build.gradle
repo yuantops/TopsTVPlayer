@@ -19,6 +19,7 @@ android {
 }
 
 dependencies {
-    compile files('libs/core.jar')
-    compile files('libs/universal-image-loader-1.9.3.jar')
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
+    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+    compile 'com.android.support:support-v4:19.0.+'
 }
