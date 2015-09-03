@@ -2,12 +2,7 @@ package com.yuantops.tvplayer.util;
 
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
-import com.yuantops.tvplayer.ui.ChatActivity;
-import com.yuantops.tvplayer.ui.HomeActivity;
-import com.yuantops.tvplayer.ui.RegisterActivity;
-import com.yuantops.tvplayer.ui.VideoDisplayActivity;
-import com.yuantops.tvplayer.ui.VideoPlayActivity;
-import com.yuantops.tvplayer.ui.VideoPlayActivity_Vitamio;
+import com.yuantops.tvplayer.ui.*;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,8 +17,14 @@ import android.widget.Toast;
  */
 public class UIRobot {
 	public static final String TAG = UIRobot.class.getSimpleName();
-	
-	public static void gotoHomePage (Context mContext) {
+
+	public static void gotoMainPage(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        context.startActivity(intent);
+        AppManager.getInstance().finishActivity((Activity) context);
+    }
+
+	public static void gotoHomePage(Context mContext) {
 		Intent intent = new Intent(mContext, HomeActivity.class);
 		mContext.startActivity(intent);
 		AppManager.getInstance().finishActivity((Activity)mContext);
@@ -33,7 +34,7 @@ public class UIRobot {
 	 * 跳转到注册页面
 	 * @param mContext
 	 */
-	public static void gotoRegisterPage (Context mContext) {
+	public static void gotoRegisterPage(Context mContext) {
 		Intent intent = new Intent(mContext, RegisterActivity.class);
 		mContext.startActivity(intent);
 	}

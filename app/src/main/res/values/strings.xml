@@ -4,5 +4,6 @@
     <string name="app_name">TopsTVPlayer</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="webapi_server_desp">Web API Server\'s IP:</string>
 
 </resources>
