@@ -36,6 +36,6 @@ public class WebAPIServerActivity extends Activity implements OnClickListener {
             return;
         }
         Log.d(TAG, "Valid url, jump to MainPage");
-        UIRobot.gotoMainPage(this);
+        UIRobot.gotoMainPage(this, edtxContent);
     }
 }

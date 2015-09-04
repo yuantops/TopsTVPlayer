@@ -1,5 +1,6 @@
 package com.yuantops.tvplayer.util;
 
+import android.os.Bundle;
 import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.bean.Video;
 import com.yuantops.tvplayer.ui.*;
@@ -18,8 +19,12 @@ import android.widget.Toast;
 public class UIRobot {
 	public static final String TAG = UIRobot.class.getSimpleName();
 
-	public static void gotoMainPage(Context context) {
+	public static void gotoMainPage(Context context, String url) {
         Intent intent = new Intent(context, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("url", url);
+        intent.putExtras(bundle);
+//		intent.putExtra("url", url);
         context.startActivity(intent);
         AppManager.getInstance().finishActivity((Activity) context);
     }

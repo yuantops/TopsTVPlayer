@@ -40,7 +40,6 @@
         </activity>
 
 
-
         <activity android:name="com.yuantops.tvplayer.ui.LoginActivity" >
         </activity>
         <activity android:name="com.yuantops.tvplayer.ui.HomeActivity" >
