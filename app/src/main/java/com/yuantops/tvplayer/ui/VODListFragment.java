@@ -6,23 +6,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.yuantops.tvplayer.R;
-import com.yuantops.tvplayer.adapter.GridViewAdapterDetail;
 import com.yuantops.tvplayer.adapter.ListviewAdapter;
-import com.yuantops.tvplayer.bean.Video;
 import com.yuantops.tvplayer.util.VolleySingleton;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 /**
  * Created by yuan on 9/4/15.
@@ -36,6 +32,7 @@ public class VODListFragment extends SherlockFragment {
     private static ListviewAdapter movielistAdapter;
 
     private ListView listViewVOD;
+    private AdapterView.OnItemClickListener clickListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,20 +43,6 @@ public class VODListFragment extends SherlockFragment {
         }
         Log.v(TAG + " >>intent from MainActivity", MainActivity.url);
     }
-
-//        JSONArray jsonArray = new JSONArray();
-//        for (int i = 0; i < 5; i++) {
-//            JSONObject obj = new JSONObject();
-//            try {
-//                obj.put("videoNameCn", "hello");
-//                obj.put("genre", "comedy");
-//                obj.put("releaseDate", "2012");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            jsonArray.put(obj);
-//        }
-//        movieList = jsonArray;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,6 +76,27 @@ public class VODListFragment extends SherlockFragment {
 
         movielistAdapter = new ListviewAdapter(getActivity(), movieList);
         listViewVOD.setAdapter(movielistAdapter);
+
+        clickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String videoUrl;
+                try {
+                    videoUrl = ((JSONObject) movieList.get(position)).getString("standardDefiUrl");
+                } catch (JSONException e) {
+                    videoUrl = null;
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(getActivity(), VideoPlayActivity.class);
+                Bundle intentArgs = new Bundle();
+                intentArgs.putString("standardDefiUrl", videoUrl);
+                intentArgs.putString("type", "VOD");
+                intent.putExtras(intentArgs);
+                getActivity().startActivity(intent);
+            }
+        };
+        listViewVOD.setOnItemClickListener(clickListener);
+
         return v;
     }
 }

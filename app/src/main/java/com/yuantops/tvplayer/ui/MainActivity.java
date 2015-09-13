@@ -3,8 +3,6 @@ package com.yuantops.tvplayer.ui;
 import java.util.HashMap;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.yuantops.tvplayer.AppContext;
-import com.yuantops.tvplayer.AppManager;
 import com.yuantops.tvplayer.R;
 import android.content.Context;
 import android.content.Intent;
@@ -18,8 +16,6 @@ import android.widget.TabHost;
 
 public class MainActivity extends SherlockFragmentActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
-	private AppContext appContext = null;
-
 	public static String url = null;
 
 	private TabHost mTabHost;
@@ -29,15 +25,13 @@ public class MainActivity extends SherlockFragmentActivity {
 	private String[] tabTags = { "movie", "broadcast" };
 	@SuppressWarnings("rawtypes")
 	private Class[] fragmentClasses = { VODListFragment.class,
-			VODListFragment.class };
+			LiveListFragment.class };
 
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setTheme(R.style.Theme_Sherlock_Light);
-		AppManager.getInstance().addActivity(this);
-		appContext = (AppContext) this.getApplicationContext();
 
 		Intent intent = getIntent();
 		Bundle args = intent.getExtras();
