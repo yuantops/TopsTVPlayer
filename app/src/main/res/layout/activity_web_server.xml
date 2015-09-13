@@ -18,6 +18,7 @@
 
         <EditText android:layout_width="match_parent" android:layout_height="wrap_content"
                   android:id="@+id/web_api_server_ip"
+                  android:text="http://10.103.31.60:8080"
                 />
 
         <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
