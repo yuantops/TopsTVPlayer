@@ -24,6 +24,7 @@ dependencies {
     compile 'com.android.support:support-v4:19.0.+'
     compile 'me.neavo:vitamio:4.2.2'
     compile 'com.google.zxing:core:2.0'
+    compile 'com.mcxiaoke.volley:library:1.0.18'
 
     testCompile 'junit:junit:4.12'
 }

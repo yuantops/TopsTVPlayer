@@ -17,8 +17,10 @@ import android.view.View;
 import android.widget.TabHost;
 
 public class MainActivity extends SherlockFragmentActivity {
-	private static final String TAG = HomeActivity.class.getSimpleName();
+	private static final String TAG = MainActivity.class.getSimpleName();
 	private AppContext appContext = null;
+
+	public static String url = null;
 
 	private TabHost mTabHost;
 	private TabManager mTabManager;
@@ -26,19 +28,23 @@ public class MainActivity extends SherlockFragmentActivity {
 	private String[] tabNames = { "点播", "直播" };
 	private String[] tabTags = { "movie", "broadcast" };
 	@SuppressWarnings("rawtypes")
-	private Class[] fragmentClasses = { MovieListFragment.class,
-			MovieListFragment.class };
+	private Class[] fragmentClasses = { VODListFragment.class,
+			VODListFragment.class };
 
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		setTheme(R.style.Theme_Sherlock); // Used for theme switching in samples
+		setTheme(R.style.Theme_Sherlock_Light);
 		AppManager.getInstance().addActivity(this);
 		appContext = (AppContext) this.getApplicationContext();
 
 		Intent intent = getIntent();
 		Bundle args = intent.getExtras();
+
+		if (url == null) {
+			url = args.getString("url");
+		}
 
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();

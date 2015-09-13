@@ -29,12 +29,6 @@ public class UIRobot {
         AppManager.getInstance().finishActivity((Activity) context);
     }
 
-	public static void gotoHomePage(Context mContext) {
-		Intent intent = new Intent(mContext, HomeActivity.class);
-		mContext.startActivity(intent);
-		AppManager.getInstance().finishActivity((Activity)mContext);
-	}
-	
 	/**
 	 * 跳转到注册页面
 	 * @param mContext
@@ -58,12 +52,7 @@ public class UIRobot {
 		mContext.startActivity(intent);
 		//AppManager.getInstance().finishActivity();
 	}
-	
-	public static void enterChatroom(Context mContext) {
-		Intent intent = new Intent(mContext, ChatActivity.class);
-		mContext.startActivity(intent);
-	}
-	
+
 	/**
 	 * 跳转到播放器页面
 	 * @param mContext

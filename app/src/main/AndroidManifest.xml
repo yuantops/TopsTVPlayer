@@ -40,24 +40,13 @@
         </activity>
 
 
-        <activity android:name="com.yuantops.tvplayer.ui.LoginActivity" >
-        </activity>
-        <activity android:name="com.yuantops.tvplayer.ui.HomeActivity" >
-        </activity>
         <activity android:name="com.yuantops.tvplayer.ui.RegisterActivity" >
-        </activity>
-        <activity android:name="com.yuantops.tvplayer.ui.ChatActivity" >
         </activity>
         <activity android:name="com.yuantops.tvplayer.ui.VideoDisplayActivity" >
         </activity>
         <activity android:name="com.yuantops.tvplayer.ui.VideoPlayActivity" >
         </activity>
 
-        <service android:name=".AppService" >
-            <intent-filter>
-                <action android:name="com.yuantops.TopsTVPlayer.SERVICE" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>
